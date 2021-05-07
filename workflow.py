@@ -17,7 +17,7 @@ windowName = 'MobyFlow'
 maxWidth = 3700
 maxHeight = 2000
 monitorScaleFactor = 1.75
-ANALYSIS_SIZE = 400
+HOUGH_ANALYSIS_SIZE = 400
 
 
 if __name__ == '__main__':
@@ -38,14 +38,14 @@ if __name__ == '__main__':
     imgShow = cv.resize(imgPrime, (windowWidth, windowHeight))
 
     # set up an image for analysis
-    analyzerRatio = min(ANALYSIS_SIZE / imgPrime.shape[0], ANALYSIS_SIZE / imgPrime.shape[1])
+    analyzerRatio = min(HOUGH_ANALYSIS_SIZE / imgPrime.shape[0], HOUGH_ANALYSIS_SIZE / imgPrime.shape[1])
     analyzerWidth = int(imgPrime.shape[1] * analyzerRatio)
     analyzerHeight = int(imgPrime.shape[0] * analyzerRatio)
     analyzerImage = cv.resize(imgPrime, (analyzerWidth, analyzerHeight))
     (ret, analyzerImage) = cv.threshold(analyzerImage, 60, 255, cv.THRESH_BINARY)
     analyzerImageGray = cv.cvtColor(analyzerImage, cv.COLOR_BGR2GRAY)
-    minRadius = int(ANALYSIS_SIZE/2 * 0.50)
-    maxRadius = int(ANALYSIS_SIZE)
+    minRadius = 0
+    maxRadius = int(HOUGH_ANALYSIS_SIZE)
 
     # find the circles
     before = cv.getTickCount()
