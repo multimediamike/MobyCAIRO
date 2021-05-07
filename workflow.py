@@ -174,7 +174,6 @@ if __name__ == '__main__':
         elif key == KEY_ENTER:
             break
         elif key == KEY_SPACE:
-            print("HEY")
             displayLines = not displayLines
 
         elif key == 'W':
