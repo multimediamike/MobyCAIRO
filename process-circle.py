@@ -74,7 +74,7 @@ def assistedImageRotation(image):
     lineListByLength = {}
     for angle in lineList.keys():
         lineItem = lineList[angle]
-        lineListByLength[lineItem['total']] = { 'lines': lineItem['lines'], 'angle': angle }
+        lineListByLength[lineItem['total']] = { 'lines': lineItem['lines'], 'angle': angle * 1.0 }
     lengths = lineListByLength.keys()
     lengths = sorted(lengths)
     lengths.reverse()
@@ -85,8 +85,10 @@ Rotation interface:
   PgUp:  Previous candidate angle
   PgDn:  Next candidate angle
   Tab:   Rotate 90 degrees
-  Left:  Rotate counter-clockwise 1 degree
-  Right: Rotate clockwise 1 degree
+  Up:    Rotate counter-clockwise 1 degree
+  Down:  Rotate clockwise 1 degree
+  Left:  Rotate counter-clockwise 0.1 degree
+  Right: Rotate clockwise 0.1 degree
   Space: Toggle line analyzer display
   Enter: Finalize rotation
   Esc:   Quit (without proceeding further)
@@ -124,7 +126,7 @@ Rotation interface:
         # display the image
         cv.imshow(windowName, displayImage)
         print('\r', end='')
-        print('rotation # %d/%d (%d degrees)    ' % (index+1, len(lineListByLength), angle), end='', flush=True)
+        print('rotation # %d/%d (%3.1f degrees)    ' % (index+1, len(lineListByLength), angle), end='', flush=True)
 
         key = cv.waitKeyEx(0)
         if 32 < key < 128:
@@ -143,6 +145,16 @@ Rotation interface:
         elif key == KEY_PGDOWN:
             if index+1 < len(lengths):
                 index += 1
+
+        elif key == KEY_LEFT_ARROW:
+            lineListByLength[lengths[index]]['angle'] += 0.1
+        elif key == KEY_RIGHT_ARROW:
+            lineListByLength[lengths[index]]['angle'] -= 0.1
+
+        elif key == KEY_UP_ARROW:
+            lineListByLength[lengths[index]]['angle'] += 1.0
+        elif key == KEY_DOWN_ARROW:
+            lineListByLength[lengths[index]]['angle'] -= 1.0
 
     cv.destroyWindow(windowName)
     print()
