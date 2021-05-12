@@ -2,3 +2,4 @@ venv
 .vscode
 *.png
 *.bmp
+__pycache__
