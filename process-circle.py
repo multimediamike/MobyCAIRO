@@ -5,17 +5,7 @@ import os
 import screeninfo
 import sys
 
-
-KEY_TAB = 9
-KEY_ENTER = 13
-KEY_ESC = 27
-KEY_SPACE = 32
-KEY_PGUP = 0x210000
-KEY_PGDOWN = 0x220000
-KEY_LEFT_ARROW = 0x250000
-KEY_UP_ARROW = 0x260000
-KEY_RIGHT_ARROW = 0x270000
-KEY_DOWN_ARROW = 0x280000
+import key_codes as key
 
 
 def assistedImageRotation(image):
@@ -128,43 +118,43 @@ Rotation interface:
         print('\r', end='')
         print('rotation # %d/%d (%3.1f degrees)    ' % (index+1, len(lineListByLength), angle), end='', flush=True)
 
-        key = cv.waitKeyEx(0)
-        if 32 < key < 128:
-            key = chr(key).upper()
+        keyCode = cv.waitKeyEx(0)
+        if 32 < keyCode < 128:
+            keyCode = chr(keyCode).upper()
 
-        if key == KEY_ESC:
+        if keyCode == key.ESC:
             break
-        elif key == KEY_ENTER:
+        elif keyCode == key.ENTER:
             break
-        elif key == KEY_SPACE:
+        elif keyCode == key.SPACE:
             displayLines = not displayLines
         
-        elif key == KEY_PGUP:
+        elif keyCode == key.PGUP:
             if index-1 >= 0:
                 index -= 1
-        elif key == KEY_PGDOWN:
+        elif keyCode == key.PGDOWN:
             if index+1 < len(lengths):
                 index += 1
 
-        elif key == KEY_LEFT_ARROW:
+        elif keyCode == key.LEFT_ARROW:
             lineListByLength[lengths[index]]['angle'] += 0.1
-        elif key == KEY_RIGHT_ARROW:
+        elif keyCode == key.RIGHT_ARROW:
             lineListByLength[lengths[index]]['angle'] -= 0.1
 
-        elif key == KEY_UP_ARROW:
+        elif keyCode == key.UP_ARROW:
             lineListByLength[lengths[index]]['angle'] += 1.0
-        elif key == KEY_DOWN_ARROW:
+        elif keyCode == key.DOWN_ARROW:
             lineListByLength[lengths[index]]['angle'] -= 1.0
 
-        elif key == KEY_TAB:
+        elif keyCode == key.TAB:
             lineListByLength[lengths[index]]['angle'] += 90.0
 
     cv.destroyWindow(windowName)
     print()
 
-    if key == KEY_ESC:
+    if keyCode == key.ESC:
         return None
-    elif KEY_ENTER:
+    elif keyCode == key.ENTER:
         # perform final rotation on the original image
         (rows, cols, _) = image.shape
         M = cv.getRotationMatrix2D(((cols-1)/2.0,(rows-1)/2.0),lineListByLength[lengths[index]]['angle'],1)
@@ -242,43 +232,43 @@ Circle cropping interface:
         print('\r', end='')
         print('circle # %d/%d @ (%d, %d), r = %d    ' % (index+1, len(circles[0]), centerX, centerY, radius), end='', flush=True)
 
-        key = cv.waitKeyEx(0)
-        if 32 <= key < 128:
-            key = chr(key).upper()
+        keyCode = cv.waitKeyEx(0)
+        if 32 <= keyCode < 128:
+            keyCode = chr(keyCode).upper()
         
         circle = circles[0][index]
-        if key == KEY_ESC:
+        if keyCode == key.ESC:
             break
-        elif key == KEY_ENTER:
+        elif keyCode == key.ENTER:
             break
 
-        elif key == KEY_PGUP:
+        elif keyCode == key.PGUP:
             # select previous circle
             if index > 0:
                 index -= 1
-        elif key == KEY_PGDOWN:
+        elif keyCode == key.PGDOWN:
             # select next circle
             if index < len(circles[0]):
                 index += 1
 
-        elif key == 'W':
+        elif keyCode == 'W':
             # increase radius
             circle[2] += 1
-        elif key == 'S':
+        elif keyCode == 'S':
             # decrease radius
             circle[2] -= 1
         
-        elif key == KEY_LEFT_ARROW:
+        elif keyCode == key.LEFT_ARROW:
             # move centerpoint left
             circle[0] -= 1
-        elif key == KEY_RIGHT_ARROW:
+        elif keyCode == key.RIGHT_ARROW:
             # move centerpoint right
             circle[0] += 1
         
-        elif key == KEY_DOWN_ARROW:
+        elif keyCode == key.DOWN_ARROW:
             # move centerpoint down
             circle[1] += 1
-        elif key == KEY_UP_ARROW:
+        elif keyCode == key.UP_ARROW:
             # move centerpoint up
             circle[1] -= 1
 
@@ -287,7 +277,7 @@ Circle cropping interface:
 
     print(radius, radius*widthRatio)
 
-    if key != KEY_ENTER:
+    if key != key.ENTER:
         return None
 
     # create a new canvas with all white and 1 cell of padding beyond the radius
