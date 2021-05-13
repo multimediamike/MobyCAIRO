@@ -140,3 +140,37 @@ Circle cropping interface:
         copyLine(image[centerY+i][centerX-dx:centerX+dx], croppedImage[radius+i][radius-dx:radius+dx])
 
     return croppedImage
+
+
+def assistedRectangleCrop(image, houghAnalysisSize=400):
+    windowName = "MobyCAIRO - Assisted Rectangle Crop"
+
+    # create window
+    screen = screeninfo.get_monitors()[0]
+    screenWidth = int(screen.width * 0.95)
+    screenHeight = int(screen.height * 0.90)
+    cv.namedWindow(windowName)
+
+    (primeRows, primeCols, _) = image.shape
+
+    # create the display-ready image
+    primeToDisplayScaler = max(primeRows / screenWidth, primeCols / screenHeight)
+    windowWidth = int(primeCols / primeToDisplayScaler)
+    windowHeight = int(primeRows / primeToDisplayScaler)
+    scaledImage = cv.resize(image, (windowWidth, windowHeight))
+    cv.moveWindow(windowName, screenWidth-windowWidth, 0)
+
+    print('select a rectangular region to crop and press ENTER to save the cropped image')
+    (topX, topY, rectWidth, rectHeight) = cv.selectROI(windowName, scaledImage)
+    topX = int(topX * primeToDisplayScaler)
+    topY = int(topY * primeToDisplayScaler)
+    bottomX = int(topX + rectWidth * primeToDisplayScaler)
+    bottomY = int(topY + rectHeight * primeToDisplayScaler)
+
+    print('performing final crop...')
+    croppedImage = np.zeros((bottomY-topY, bottomX-topX, 3), np.uint8)
+    # copy each line
+    for i in range(topY, bottomY):
+        copyLine(image[i][topX:bottomX], croppedImage[i-topY][:])
+
+    return croppedImage
