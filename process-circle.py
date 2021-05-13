@@ -280,8 +280,9 @@ Circle cropping interface:
     cv.rectangle(croppedImage, (0, 0), (diameter, diameter), (255, 255, 255), thickness=-1)
 
     # copy over the circle
+    print('performing final crop...')
     # copy the center line from original image to cropped image
-    copyLine(image[centerY][centerX-radius:centerX+radius], croppedImage[radius+1][:])
+    copyLine(image[centerY][centerX-radius:centerX+radius], croppedImage[radius][:])
     # copy each line
     for i in range(radius):
         dx = int(np.sqrt(np.square(radius) - np.square(i)))
