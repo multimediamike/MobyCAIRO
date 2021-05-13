@@ -173,23 +173,19 @@ def assistedCircleCrop(image, houghAnalysisSize=400):
     screenHeight = int(screen.height * 0.90)
     cv.namedWindow(windowName)
 
+    (primeRows, primeCols, _) = image.shape
+
     # create the display-ready image
-    minDimension = min(screenWidth, screenHeight)
-    print(screenWidth, screenHeight, minDimension)
-    ratio = min(minDimension / image.shape[0], minDimension / image.shape[1])
-    windowWidth = int(image.shape[1] * ratio)
-    widthRatio = image.shape[0] / windowWidth
-    windowHeight = int(image.shape[0] * ratio)
-    heightRatio = image.shape[1] / windowHeight
+    primeToDisplayScaler = max(primeRows / screenWidth, primeCols / screenHeight)
+    windowWidth = int(primeCols / primeToDisplayScaler)
+    windowHeight = int(primeRows / primeToDisplayScaler)
     scaledImage = cv.resize(image, (windowWidth, windowHeight))
     cv.moveWindow(windowName, screenWidth-windowWidth, 0)
-    print("ratio = %d, widthRatio = %d, heightRatio = %d" % (ratio, widthRatio, heightRatio))
-    print("scaled %dx%d -> %dx%d for display" % (image.shape[1], image.shape[0], windowWidth, windowHeight))
 
     # set up an image for analysis
-    analyzerRatio = min(houghAnalysisSize / image.shape[0], houghAnalysisSize / image.shape[1])
-    analyzerWidth = int(image.shape[1] * analyzerRatio)
-    analyzerHeight = int(image.shape[0] * analyzerRatio)
+    primeToAnalyzerScaler = min(primeRows, primeCols) / houghAnalysisSize
+    analyzerWidth = int(primeCols / primeToAnalyzerScaler)
+    analyzerHeight = int(primeRows / primeToAnalyzerScaler)
     analyzerImage = cv.resize(image, (analyzerWidth, analyzerHeight))
     (_, analyzerImage) = cv.threshold(analyzerImage, 60, 255, cv.THRESH_BINARY)
     analyzerImageGray = cv.cvtColor(analyzerImage, cv.COLOR_BGR2GRAY)
@@ -198,9 +194,7 @@ def assistedCircleCrop(image, houghAnalysisSize=400):
     # find the circles
     print('searching the image for circles...')
     circles = cv.HoughCircles(analyzerImageGray, cv.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=minRadius, maxRadius=0)
-
-    xRatio = scaledImage.shape[1] / analyzerImage.shape[1]
-    yRatio = scaledImage.shape[0] / analyzerImage.shape[0]
+    displayToAnalyzerScaler = 1.0 * primeToAnalyzerScaler / primeToDisplayScaler
 
     print("""=====================
 Circle cropping interface:
@@ -217,15 +211,14 @@ Circle cropping interface:
 """)
 
     index = 0
-    print(xRatio, yRatio)
     # input loop
     while True:
         (centerX, centerY, radius) = circles[0][index]
-        centerX = int(centerX * xRatio)
-        centerY = int(centerY * yRatio)
-        radius = int(radius * min(xRatio, yRatio))
+        centerX = int(centerX * displayToAnalyzerScaler)
+        centerY = int(centerY * displayToAnalyzerScaler)
+        radius = int(radius * displayToAnalyzerScaler)
         displayImage = scaledImage.copy()
-        cv.circle(displayImage, (centerX, centerY), int(radius), (0, 0, 255), 2)
+        cv.circle(displayImage, (centerX, centerY), radius, (0, 0, 255), 2)
 
         # show the update
         cv.imshow(windowName, displayImage)
@@ -275,17 +268,14 @@ Circle cropping interface:
     cv.destroyWindow(windowName)
     print()
 
-    print(radius, radius*widthRatio)
-
-    if key != key.ENTER:
+    if keyCode != key.ENTER:
         return None
 
     # create a new canvas with all white and 1 cell of padding beyond the radius
-    centerX = int(centerX * widthRatio)
-    centerY = int(centerY * widthRatio)
-    radius = int(radius * widthRatio)
+    centerX = int(centerX * primeToDisplayScaler)
+    centerY = int(centerY * primeToDisplayScaler)
+    radius = int(radius * primeToDisplayScaler)
     diameter = int(radius*2) + 1
-    print('scaled radius = %d, radius = %d, diameter = %d' % (radius, radius*widthRatio, diameter))
     croppedImage = np.zeros((diameter, diameter, 3), np.uint8)
     cv.rectangle(croppedImage, (0, 0), (diameter, diameter), (255, 255, 255), thickness=-1)
 
@@ -349,4 +339,5 @@ if __name__ == '__main__':
         sys.exit(0)
 
     # save the image
+    print('saving rotated and cropped image to "%s"...' % (outputFilename))
     cv.imwrite(outputFilename, croppedImage)
