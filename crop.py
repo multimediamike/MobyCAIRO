@@ -167,6 +167,8 @@ def assistedRectangleCrop(image, houghAnalysisSize=400):
     bottomX = int(topX + rectWidth * primeToDisplayScaler)
     bottomY = int(topY + rectHeight * primeToDisplayScaler)
 
+    if rectWidth <= 0 or rectHeight <= 0:
+        return None
     print('performing final crop...')
     croppedImage = np.zeros((bottomY-topY, bottomX-topX, 3), np.uint8)
     # copy each line
