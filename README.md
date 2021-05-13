@@ -69,3 +69,5 @@ Circle cropping interface:
   Enter: Finalize rotation
   Esc:   Quit (without proceeding further)
 ```
+
+For cropping a rectangle, MobyCAIRO uses OpenCV's mouse-driven interface for selecting the crop region.
