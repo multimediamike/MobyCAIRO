@@ -141,7 +141,7 @@ Circle cropping interface:
 
 
 def assistedRectangleCrop(image, houghAnalysisSize=400):
-    windowName = "MobyCAIRO - Assisted Rectangle Crop"
+    windowName = "MobyCAIRO - Rectangle Crop"
 
     # create window
     screen = screeninfo.get_monitors()[0]
