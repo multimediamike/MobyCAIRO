@@ -1,6 +1,11 @@
+import sys
 import tkinter as tk
 
 import process
+
+if len(sys.argv) < 3:
+    print('%s <input image filename> <output image filename.PNG>' % (sys.argv[0]))
+    sys.exit(1)
 
 circle = False
 
@@ -31,5 +36,4 @@ tk.Button()
 
 root.mainloop()
 
-print("time to process the image: circle? %s" % (str(circle)))
 process.processImage(circle=circle)
