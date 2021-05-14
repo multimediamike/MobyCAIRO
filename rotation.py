@@ -16,7 +16,7 @@ def assistedImageRotation(image):
 
     # create the display-ready image
     minDimension = min(screenWidth, screenHeight)
-    ratio = min(minDimension / image.shape[0], minDimension / image.shape[1])
+    ratio = max(minDimension / image.shape[0], minDimension / image.shape[1])
     windowWidth = int(image.shape[1] * ratio)
     windowHeight = int(image.shape[0] * ratio)
     scaledImage = cv.resize(image, (windowWidth, windowHeight))
