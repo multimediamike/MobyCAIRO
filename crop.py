@@ -75,9 +75,7 @@ Circle cropping interface:
         print('\r', end='')
         print('circle # %d/%d @ (%d, %d), r = %d    ' % (index+1, len(circles[0]), centerX, centerY, radius), end='', flush=True)
 
-        keyCode = cv.waitKeyEx(0)
-        if 32 <= keyCode < 128:
-            keyCode = chr(keyCode).upper()
+        keyCode = key.translateKey(cv.waitKeyEx(0))
         
         circle = circles[0][index]
         if keyCode == key.ESC:

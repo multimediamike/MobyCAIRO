@@ -113,9 +113,7 @@ Rotation interface:
         print('\r', end='')
         print('rotation # %d/%d (%3.1f degrees)    ' % (index+1, len(lineListByLength), angle), end='', flush=True)
 
-        keyCode = cv.waitKeyEx(0)
-        if 32 < keyCode < 128:
-            keyCode = chr(keyCode).upper()
+        keyCode = key.translateKey(cv.waitKeyEx(0))
 
         if keyCode == key.ESC:
             break
