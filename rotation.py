@@ -24,7 +24,6 @@ def assistedImageRotation(image):
     print("scaled %dx%d -> %dx%d for display" % (image.shape[1], image.shape[0], windowWidth, windowHeight))
 
     # create an image for Hough line analysis
-    #lineAnalyzerImage = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     lineAnalyzerImage = cv.cvtColor(scaledImage, cv.COLOR_BGR2GRAY)
     lineAnalyzerImage = cv.GaussianBlur(lineAnalyzerImage, (7, 7), 0)
 
