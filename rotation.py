@@ -69,7 +69,7 @@ def assistedImageRotation(image):
 Rotation interface:
   PgUp:  Select previous candidate angle
   PgDn:  Select next candidate angle
-  Tab:   Rotate 90 degrees
+  `:     Rotate 90 degrees
   Up:    Rotate counter-clockwise 1 degree
   Down:  Rotate clockwise 1 degree
   Left:  Rotate counter-clockwise 0.1 degree
@@ -139,7 +139,7 @@ Rotation interface:
         elif keyCode == key.DOWN_ARROW:
             lineListByLength[lengths[index]]['angle'] -= 1.0
 
-        elif keyCode == key.TAB:
+        elif keyCode == '`':
             lineListByLength[lengths[index]]['angle'] += 90.0
 
     cv.destroyWindow(windowName)

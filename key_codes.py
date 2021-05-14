@@ -1,4 +1,3 @@
-TAB = 'TAB'
 ENTER = 'ENTER'
 ESC = 'ESC'
 SPACE = 'SPACE'
@@ -15,26 +14,25 @@ def translateKey(keyCode):
         keyCode = chr(keyCode).upper()
         return keyCode
 
-    if keyCode == 9:
-        return TAB
-    elif keyCode == 13:
+    if keyCode == 13:
         return ENTER
     elif keyCode == 27:
         return ESC
     elif keyCode == 32:
         return SPACE
 
-    elif keyCode in [ 0x210000 ]:
+    elif keyCode in [ 0x210000, 0xFF55 ]:
         return PGUP
-    elif keyCode in [ 0x220000 ]:
+    elif keyCode in [ 0x220000, 0xFF56 ]:
         return PGDOWN
-    elif keyCode in [ 0x250000 ]:
+    elif keyCode in [ 0x250000, 0xFF51 ]:
         return LEFT_ARROW
-    elif keyCode in [ 0x260000 ]:
+    elif keyCode in [ 0x260000, 0xFF52 ]:
         return UP_ARROW
-    elif keyCode in [ 0x270000 ]:
+    elif keyCode in [ 0x270000, 0xFF53 ]:
         return RIGHT_ARROW
-    elif keyCode in [ 0x280000 ]:
+    elif keyCode in [ 0x280000, 0xFF54 ]:
         return DOWN_ARROW
 
     return keyCode
+
