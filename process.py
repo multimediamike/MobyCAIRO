@@ -6,6 +6,31 @@ import crop
 import rotation
 
 
+def validateArguments(infile, outfile):
+    # verify that the input file exists
+    if not os.path.exists(infile):
+        print("input file '%s' does not exist" % (infile))
+        return False
+
+    # verify that the output file does not already exist
+    if os.path.exists(outfile):
+        print("'%s' already exists" % (outfile))
+        return False
+
+    # now that it's verified that the output file is not present, make sure that it can
+    # be written to, so that the user doesn't waste time editing this file only to find
+    # that it can't be written
+    try:
+        open(outfile, 'wb')
+    except:
+        print("can't write to output file '%s'" % (outfile))
+        return False
+    # don't leave the test file around
+    os.unlink(outfile)
+
+    return True
+
+
 # This function processes a circle if the circle parm is True;
 # else, process a rectangle
 def processImage(circle=True):
@@ -16,21 +41,9 @@ def processImage(circle=True):
     inputFilename = sys.argv[1]
     outputFilename = sys.argv[2]
 
-    # verify that the output file does not already exist
-    if os.path.exists(outputFilename):
-        print("'%s' already exists" % (outputFilename))
-        sys.exit(2)
-
-    # now that it's verified that the output file is not present, make sure that it can
-    # be written to, so that the user doesn't waste time editing this file only to find
-    # that it can't be written
-    try:
-        open(outputFilename, 'wb')
-    except:
-        print("can't write to output file '%s'" % (outputFilename))
-        sys.exit(3)
-    # don't leave the test file around
-    os.unlink(outputFilename)
+    if not validateArguments(inputFilename, outputFilename):
+        print('could not validate arguments')
+        return
 
     # load the image
     imagePrime = cv.imread(inputFilename)
