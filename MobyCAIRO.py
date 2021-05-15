@@ -1,39 +1,101 @@
+import cv2 as cv
+from PIL import Image, ImageTk
+import screeninfo
 import sys
 import tkinter as tk
+import tkinter.font as font
 
 import process
 
+action = None
+
+# event handlers
+def doRectangle(arg=None):
+    global action
+    action = "rectangle"
+    root.destroy()
+
+
+def doCircle(arg=None):
+    global action
+    action = "circle"
+    root.destroy()
+
+
+def doEscape(arg):
+    global action
+    action = None
+    root.destroy()
+
+
+# process arguments
 if len(sys.argv) < 3:
-    print('%s <input image filename> <output image filename.PNG>' % (sys.argv[0]))
+    print('%s <input image filename> <output image filename>' % (sys.argv[0]))
     sys.exit(1)
 
-circle = False
+inputFilename = sys.argv[1]
+outputFilename = sys.argv[2]
 
-def do_circle():
-    global circle
-    circle = True
-    root.destroy()
+if not process.validateArguments(inputFilename, outputFilename):
+    print('could not validate arguments')
+    sys.exit(1)
 
-def do_rectangle():
-    global circle
-    circle = False
-    root.destroy()
-
+# create the UI frame
 root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack()
+largeFont = font.Font(size=40)
 
+# top button
+button = tk.Button(frame,
+                   text="Process (R)ectangle",
+                   command=doRectangle)
+button['font'] = largeFont
+button.pack(side=tk.TOP)
+
+# query the monitor dimension
+screen = screeninfo.get_monitors()[0]
+screenWidth = int(screen.width * 0.95)
+screenHeight = int(screen.height * 0.80)
+
+# use OpenCV to load the image
+image = cv.imread(inputFilename)
+
+# scale down the image and move the window to the right side of the screen
+minDimension = min(screenWidth, screenHeight)
+ratio = max(minDimension / image.shape[0], minDimension / image.shape[1])
+windowWidth = int(image.shape[1] * ratio)
+windowHeight = int(image.shape[0] * ratio)
+root.geometry("+%d+20" % (screenWidth-windowWidth))
+scaledImage = cv.resize(image, (windowWidth, windowHeight))
+scaledImage = cv.cvtColor(scaledImage, cv.COLOR_BGR2RGB)
+
+# put the image on a label
+image = ImageTk.PhotoImage(Image.fromarray(scaledImage))
+photoLabel = tk.Label(frame, image=image)
+photoLabel.pack(side=tk.TOP)
+
+# bottom button
 button = tk.Button(frame, 
-                   text="Circle", 
-                   command=do_circle)
-button.pack(side=tk.LEFT)
-slogan = tk.Button(frame,
-                   text="Rectangle",
-                   command=do_rectangle)
-slogan.pack(side=tk.LEFT)
+                   text="Process (C)ircle",
+                   command=doCircle)
+button['font'] = largeFont
+button.pack(side=tk.BOTTOM)
 
-tk.Button()
+# bind the keyboard handlers
+root.bind('<Escape>', doEscape)
+root.bind('<R>', doRectangle)
+root.bind('<r>', doRectangle)
+root.bind('<C>', doCircle)
+root.bind('<c>', doCircle)
 
+# run the main UI loop
 root.mainloop()
 
-process.processImage(circle=circle)
+# proceed to the editing action
+if action == 'circle':
+    process.processImage(circle=True)
+elif action == 'rectangle':
+    process.processImage(circle=False)
+else:
+    print('exiting with no editing action')
