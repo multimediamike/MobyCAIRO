@@ -42,6 +42,7 @@ if not process.validateArguments(inputFilename, outputFilename):
 
 # create the UI frame
 root = tk.Tk()
+root.title('MobyCAIRO - Select Editing Mode')
 frame = tk.Frame(root)
 frame.pack()
 largeFont = font.Font(size=40)
@@ -56,7 +57,7 @@ button.pack(side=tk.TOP)
 # query the monitor dimension
 screen = screeninfo.get_monitors()[0]
 screenWidth = int(screen.width * 0.95)
-screenHeight = int(screen.height * 0.80)
+screenHeight = int(screen.height * 0.70)
 
 # use OpenCV to load the image
 image = cv.imread(inputFilename)
