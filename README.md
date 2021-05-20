@@ -8,6 +8,26 @@ The 'Moby' portion of the name is due to its original purpose being to help alle
 
 The tool is a run from the command line with an input image filename and an output image filename. It first presents the image with a grid overlay and allows the user to cycle through the most likely rotation angles in order to straighten the image. When the user is satisfied, that the image is straight, the tool then assists to find the best circle or rectangle cropping region. Then it saves the final edit back to the PNG output file specified on the command line.
 
+## Demonstration By Screenshots
+
+When run the UI will first show the image and ask whether to edit the image as a rectangle or a circle. This choice changes the cropping interface that is used in the cropping phase (automatically detecting a circle and allowing fine adjustments, or a simple rectangular image select). Click on 1 of the 2 buttons, or press 'c' or 'r' if you are more keyboard-oriented:
+
+![MobyCAIRO Editing Mode Selection](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-select-editing-mode.jpg)
+
+Next, MobyCAIRO finds the straight lines in the image, groups them by angles, and shows the most likely rotation while allowing the user to select among candidate angles and make fine adjustments. Further, the tool overlays a light grid which helps to visually verify straightness:
+
+![MobyCAIRO Assisted Rotation](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-circle-rotation.jpg)
+
+In this mode, the tool also allows toggling to see the edges that are used to determine how straight lines were discovered in the image:
+
+![MobyCAIRO Show Detected Lines](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-show-lines.png)
+
+When the image as been satisfactorily straightened, MobyCAIRO presents the user with an interface to crop the image. For a rectangular crop, the tool provides a simple mouse-driven interface. For a circle, however, MobyCAIRO assists the user by attempting to find the most likely circle. Similar to the assisted rotation, the tool allows the user to switch between likely candidate circles and also make fine adjustments.
+
+![MobyCAIRO Assisted Circle Crop](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-assisted-circle-crop.jpg)
+
+When the crop regions are set, the user can exit the program to save the final edited image.
+
 ## Supported Input Image Formats
 
 MobyCAIRO uses the [OpenCV](https://opencv.org/) computer vision library. MobyCAIRO can read any format that the underlying OpenCV library supports, which includes:
