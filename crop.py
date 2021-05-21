@@ -5,15 +5,6 @@ import screeninfo
 import key_codes as key
 
 
-# Copy the source slice over the dest slice
-# TODO: There must be a way to optimize over this pixel-by-pixel approach
-def copyLine(source, dest):
-    i = 0
-    for pixel in source:
-        dest[i] = pixel
-        i += 1
-
-
 def assistedCircleCrop(image, houghAnalysisSize=400):
     windowName = "MobyCAIRO - Assisted Circle Crop"
 
@@ -129,13 +120,11 @@ Circle cropping interface:
 
     # copy over the circle
     print('performing final crop...')
-    # copy the center line from original image to cropped image
-    copyLine(image[centerY][centerX-radius:centerX+radius], croppedImage[radius][:])
-    # copy each line
+    croppedImage[radius][0:radius*2] = image[centerY][centerX-radius:centerX+radius]
     for i in range(radius):
         dx = int(np.sqrt(np.square(radius) - np.square(i)))
-        copyLine(image[centerY-i][centerX-dx:centerX+dx], croppedImage[radius-i][radius-dx:radius+dx])
-        copyLine(image[centerY+i][centerX-dx:centerX+dx], croppedImage[radius+i][radius-dx:radius+dx])
+        croppedImage[radius-i][radius-dx:radius+dx] = image[centerY-i][centerX-dx:centerX+dx]
+        croppedImage[radius+i][radius-dx:radius+dx] = image[centerY+i][centerX-dx:centerX+dx]
 
     return croppedImage
 
@@ -171,6 +160,6 @@ def assistedRectangleCrop(image, houghAnalysisSize=400):
     croppedImage = np.zeros((bottomY-topY, bottomX-topX, 3), np.uint8)
     # copy each line
     for i in range(topY, bottomY):
-        copyLine(image[i][topX:bottomX], croppedImage[i-topY][:])
+        croppedImage[i-topY][:] = image[i][topX:bottomX]
 
     return croppedImage
