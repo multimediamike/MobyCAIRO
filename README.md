@@ -10,7 +10,7 @@ The tool is a run from the command line with an input image filename and an outp
 
 ## Demonstration By Screenshots
 
-When run the UI will first show the image and ask whether to edit the image as a rectangle or a circle. This choice changes the cropping interface that is used in the cropping phase (automatically detecting a circle and allowing fine adjustments, or a simple rectangular image select). Click on 1 of the 2 buttons, or press 'c' or 'r' if you are more keyboard-oriented:
+When run, the UI will first show the image and ask whether to edit the image as a rectangle or a circle. This choice changes the interface that is used in the cropping phase (automatically detecting a circle and allowing fine adjustments vs. or a simple rectangular image select). Click on 1 of the 2 buttons, or press 'c' or 'r' if you are more keyboard-oriented:
 
 ![MobyCAIRO Editing Mode Selection](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-select-editing-mode.jpg)
 
@@ -55,10 +55,11 @@ Note that there are a few caveats to the above support, as well as some more sup
 
 ## Running The Tool
 
-There are 2 separate tools: one for processing circles (e.g., scans of CD-ROMs), and one for processing rectangles (e.g., scans of boxes or jewel cases artwork).
+Run the main MobyCAIRO.py tool against an image while also specifying an output image:
 
-* `python process-circle.py <input-scan.ext> <output.png>`
-* `python process-rectangle.py <input-scan.ext> <output.png>`
+`python MobyCAIRO.py <input-scan.ext> <output.ext>`
+
+This will first ask if you want to treat an image as a rectangle or a circle. Then in will assist you in rotating, then cropping then input image before saving it as the output image.
 
 After launching, MobyCAIRO will create a window on the right side of the screen while presenting a keyboard-based user interface on the terminal.
 
