@@ -28,6 +28,8 @@ When the image as been satisfactorily straightened, MobyCAIRO presents the user 
 
 When the crop regions are set, the user can exit the program to save the final edited image.
 
+*See the final straightenend and cropped scans for [this CD-ROM and related jewel case artifacts at the Internet Archive](https://archive.org/details/cdrom-WhiteWolfSoftwareSeries29).*
+
 ## Supported Input Image Formats
 
 MobyCAIRO uses the [OpenCV](https://opencv.org/) computer vision library. MobyCAIRO can read any format that the underlying OpenCV library supports, which includes:
