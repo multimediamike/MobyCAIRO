@@ -7,6 +7,16 @@ import tkinter.font as font
 
 import process
 
+versionImported = False
+try:
+    import version
+    versionImported = True
+except ImportError:
+    pass
+if versionImported:
+    print('%s version %s' % (sys.argv[0], version.versionString))
+
+
 action = None
 
 # event handlers
