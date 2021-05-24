@@ -82,7 +82,7 @@ Circle cropping interface:
   Up:    Move center point up 1 pixel
   Right: Move center point right 1 pixel
   Down:  Move center point down 1 pixel
-  Enter: Finalize rotation
+  Enter: Finalize crop and save image
   Esc:   Quit (without proceeding further)
 ```
 
