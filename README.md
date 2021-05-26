@@ -48,7 +48,8 @@ MobyCAIRO is a tool that runs on a user's local machine (as opposed to running i
 
 Run the main MobyCAIRO.py tool against an image while also specifying an output image:
 
-`python MobyCAIRO.py <input-scan.ext> <output.ext>`
+* (Windows EXE): `MobyCAIRO <input-scan.ext> <output.ext>`
+* (Direct from Python) `python MobyCAIRO.py <input-scan.ext> <output.ext>`
 
 This command will first present a UI with the image and 2 buttons which prompt you to select whether to treat an image as a rectangle or a circle. Then it will assist you in rotating, then cropping the input image before saving it as the output image.
 
@@ -122,3 +123,5 @@ These are the technologies used to build this tool:
 * [OpenCV](https://opencv.org/): Open source computer vision library use for image manipulation, feature detection, and basic GUI
   - [Hough transform](https://en.wikipedia.org/wiki/Hough_transform) for finding straight lines and circles
   - [Canny edge detector](https://en.wikipedia.org/wiki/Canny_edge_detector) for highlighting the edges of an image
+
+You can read more about the program's development from [this blog post by the author](https://multimedia.cx/eggs/developing-mobycairo/).
