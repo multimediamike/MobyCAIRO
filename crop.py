@@ -129,7 +129,7 @@ Circle cropping interface:
     return croppedImage
 
 
-def assistedRectangleCrop(image, houghAnalysisSize=400):
+def assistedRectangleCrop(image):
     windowName = "MobyCAIRO - Rectangle Crop"
 
     # create window
