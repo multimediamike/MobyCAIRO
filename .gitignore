@@ -1,6 +1,5 @@
 venv
 .vscode
-*.png
 *.bmp
 __pycache__
 version.py
