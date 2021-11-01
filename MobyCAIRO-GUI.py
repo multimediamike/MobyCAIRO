@@ -243,7 +243,7 @@ class MobyCAIRO:
 
         # load the logo
         self.logoImage = ImageTk.PhotoImage(Image.open(self.logoFilename))
-        self.logoLabel = tk.Label(self.controlFrame, image=self.logoImage, text="Hey, is this thing on?")
+        self.logoLabel = tk.Label(self.controlFrame, image=self.logoImage)
         self.logoLabel.pack(side=tk.TOP, expand=tk.YES, fill=tk.BOTH)
 
         # make a tab control
