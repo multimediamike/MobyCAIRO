@@ -15,6 +15,8 @@ class MobyCAIRO:
         ('All files', '*.*')
     )
 
+    logoFilename = "MobyCAIRO.png"
+
 
     #############################################
     # Event handlers
@@ -238,6 +240,11 @@ class MobyCAIRO:
         # set up the controller frame
         self.controlFrame = tk.Frame(self.mainContainer)
         self.controlFrame.pack(side=tk.LEFT, expand=tk.NO, padx=5, pady=5, ipadx=5, ipady=5)
+
+        # load the logo
+        self.logoImage = ImageTk.PhotoImage(Image.open(self.logoFilename))
+        self.logoLabel = tk.Label(self.controlFrame, image=self.logoImage, text="Hey, is this thing on?")
+        self.logoLabel.pack(side=tk.TOP, expand=tk.YES, fill=tk.BOTH)
 
         # make a tab control
         self.tabControl = ttk.Notebook(self.controlFrame)
