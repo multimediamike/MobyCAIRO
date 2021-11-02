@@ -41,10 +41,17 @@ class MobyCAIRO:
 
         # perform straight line analysis to find possible rotation candidate angles
         self.straightLineAnalysis()
+
         # populate the candidate angle list box
         for i in range(len(self.lengths)):
             self.angleList.insert(i, str('%0.2f' % self.lineListByLength[self.lengths[i]]['angle']) + '°')
         self.drawImage()
+
+        # automatically skip to the next tab
+        self.tabControl.select(1)
+
+        # select the first angle in the list box
+        self.angleList.select_set(0)
 
 
     def imageLabelMouseDown(self, event):
@@ -129,8 +136,6 @@ class MobyCAIRO:
         lengths = self.lineListByLength.keys()
         self.lengths = sorted(lengths)
         self.lengths.reverse()
-        self.angleList.select_set(0)
-        self.angleList.event_generate("<<ListboxSelect>>")
 
 
     def drawImage(self):
@@ -179,7 +184,7 @@ class MobyCAIRO:
 
     def initLoadTab(self):
         self.loadTab = ttk.Frame(self.tabControl)
-        self.tabControl.add(self.loadTab, text="Load")
+        self.tabControl.add(self.loadTab, text=" Load ")
 
         ttk.Label(self.loadTab, text="Load image: ").pack(side=tk.TOP, expand=tk.NO, padx=5, pady=5)
         self.buttonLoadFile = ttk.Button(self.loadTab, text="Select image file...", command=self.buttonClickLoadImage).pack(side=tk.TOP, expand=tk.NO, padx=5, pady=5)
@@ -187,7 +192,7 @@ class MobyCAIRO:
 
     def initRotateTab(self):
         self.rotateTab = ttk.Frame(self.tabControl)
-        self.tabControl.add(self.rotateTab, text="Rotate")
+        self.tabControl.add(self.rotateTab, text=" Rotate ")
 
         # work on the zoom feature a bit later
         #ttk.Label(self.rotateTab, text="Zoom: ").grid(column=0, row=0, padx=3, pady=10, sticky='e')
@@ -222,12 +227,12 @@ class MobyCAIRO:
 
     def initCropTab(self):
         self.cropTab = ttk.Frame(self.tabControl)
-        self.tabControl.add(self.cropTab, text="Crop")
+        self.tabControl.add(self.cropTab, text=" Crop ")
 
 
     def initSaveTab(self):
         self.saveTab = ttk.Frame(self.tabControl)
-        self.tabControl.add(self.saveTab, text="Save")
+        self.tabControl.add(self.saveTab, text=" Save ")
 
 
     def initGUI(self):
