@@ -92,17 +92,23 @@ class MobyCAIRO:
     #############################################
     # Image functions
 
-    def straightLineAnalysis(self):
+    def createAnalyzerImage(self):
+        if self.lineAnalyzerImage:
+            return
         # create an image for Hough line analysis; convert color -> grayscale
-        lineAnalyzerImage = cv.cvtColor(self.imagePrime, cv.COLOR_BGR2GRAY)
+        self.lineAnalyzerImage = cv.cvtColor(self.imagePrime, cv.COLOR_BGR2GRAY)
         # blur the image
-        lineAnalyzerImage = cv.GaussianBlur(lineAnalyzerImage, (7, 7), 0)
+        self.lineAnalyzerImage = cv.GaussianBlur(self.lineAnalyzerImage, (7, 7), 0)
+
+
+    def straightLineAnalysis(self):
+        self.createAnalyzerImage()
 
         # adapting the pipeline described in this Stack Overflow answer:
         #  https://stackoverflow.com/a/45560545/475067
         lowThreshold = 50
         highThreshold = 150
-        edges = cv.Canny(lineAnalyzerImage, lowThreshold, highThreshold)
+        edges = cv.Canny(self.lineAnalyzerImage, lowThreshold, highThreshold)
         edgesImage = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
         self.edgesImage = cv.resize(edgesImage, (self.windowWidth, self.windowHeight))
         rho = 1
@@ -282,6 +288,7 @@ class MobyCAIRO:
     def __init__(self, parent):
         self.parent = parent
         self.movingImage = False
+        self.lineAnalyzerImage = None
 
         # related to automated rotation
         self.currentAngleIndex = 0
