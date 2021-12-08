@@ -144,6 +144,44 @@ class MobyCAIRO:
         self.lengths.reverse()
 
 
+    # Find the circles in an image.
+    # Parameters:
+    #   image: the image to be analyzed
+    #   houghAnalysisSize: the pixel size to resize the image down to before analysis
+    # Returns a tuple with the following 2 fields:
+    #   * scale factor to apply to the circle components
+    #   * array of (X Y R) tuples defining circles, scaled with respect to
+    #     the houghAnalysisSize parameter, sorted in descending order by radius
+    def findCircles(self, image, houghAnalysisSize=400):
+        # set up an image for analysis
+        (primeRows, primeCols, _) = image.shape
+        scaleFactor = min(primeRows, primeCols) / houghAnalysisSize
+        analyzerWidth = int(primeCols / scaleFactor)
+        analyzerHeight = int(primeRows / scaleFactor)
+        analyzerImage = cv.resize(image, (analyzerWidth, analyzerHeight))
+        (_, analyzerImage) = cv.threshold(analyzerImage, 60, 255, cv.THRESH_BINARY)
+        analyzerImageGray = cv.cvtColor(analyzerImage, cv.COLOR_BGR2GRAY)
+
+        # find the circles
+        circlesPrime = cv.HoughCircles(analyzerImageGray, cv.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=houghAnalysisSize/2)
+
+        # qualify the discovered circles: no circles that go outside the box
+        circles = []
+        for circle in circlesPrime[0]:
+            (centerX, centerY, radius) = circle
+            if centerX - radius > 0 and \
+               centerY - radius > 0 and \
+               centerX + radius < houghAnalysisSize and \
+               centerY + radius < houghAnalysisSize:
+               circles.append(circle)
+
+        # sort by radius
+        circles = sorted(circles, key=lambda x: x[2])
+        circles.reverse()
+
+        return (scaleFactor, circles)
+
+
     def drawImage(self):
         if self.imagePrimeAspect > self.windowAspect:
             scaler = self.imagePrimeWidth / self.windowWidth
