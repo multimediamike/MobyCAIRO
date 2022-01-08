@@ -10,6 +10,11 @@ import tkinter.filedialog
 
 class MobyCAIRO:
 
+    TAB_LOAD = 0
+    TAB_ROTATE = 1
+    TAB_CROP = 2
+    TAB_SAVE = 3
+
     filetypes = (
         ('Image files', '*.png;*.jpg;*.jpeg;*.tif;*.tiff;*.bmp'),
         ('All files', '*.*')
@@ -26,6 +31,41 @@ class MobyCAIRO:
         self.windowHeight = self.imageLabel.winfo_height()
         self.windowAspect = self.windowWidth / self.windowHeight
         
+
+    def tabChanged(self, event):
+        if self.tabControl.index("current") == self.TAB_CROP:
+            # the first time this tab is presented, select the default radio button
+            if self.rotateTabFirstTransition:
+#                self.radioCropCircle.select()
+                self.rotateTabFirstTransition = False
+
+            # if the rotation angle changed, recompute candidate crops
+            currentAngleText = self.angleList.get(self.currentAngleIndex)
+            if self.currentRotationAngle != currentAngleText:
+                currentAngle = float(currentAngleText[:-1])
+                self.currentRotationAngle = currentAngleText
+
+                # compute a rotated image per the current rotation angle
+                (rows, cols, _) = self.imagePrime.shape
+                M = cv.getRotationMatrix2D(((cols-1)/2.0, (rows-1)/2.0), currentAngle, 1)
+                rotatedImage = cv.warpAffine(self.imagePrime, M, (cols, rows))
+
+                # compute most likely crop candidates
+                self.findCircles(rotatedImage)
+                self.findRects(rotatedImage)
+
+                # populate the candidate circle crop list box
+                for i in range(len(self.circles)):
+                    (centerX, centerY, radius) = self.circles[i]
+                    self.circleCropList.insert(i, str('(%d, %d), %d' % (centerX, centerY, radius)))
+
+                # populate the candidate rectangle crop box
+                for i in range(len(self.rects)):
+                    (minX, minY, maxX, maxY, _) = self.rects[i]
+                    self.rectCropList.insert(i, str('(%d, %d) -> (%d, %d)' % (minX, minY, maxX, maxY)))
+
+            self.drawImage()
+
 
     def buttonClickLoadImage(self):
         self.imageFilename = tkinter.filedialog.askopenfilename(
@@ -45,13 +85,14 @@ class MobyCAIRO:
         # populate the candidate angle list box
         for i in range(len(self.lengths)):
             self.angleList.insert(i, str('%0.2f' % self.lineListByLength[self.lengths[i]]['angle']) + '°')
-        self.drawImage()
 
         # automatically skip to the next tab
         self.tabControl.select(1)
 
         # select the first angle in the list box
         self.angleList.select_set(0)
+
+        self.drawImage()
 
 
     def imageLabelMouseDown(self, event):
@@ -69,11 +110,18 @@ class MobyCAIRO:
         self.parent.config(cursor='arrow')
 
 
-    def angleListEvent(self, event):
-        self.currentAngleIndex = self.angleList.curselection()[0]
+    def listEvent(self, event):
+        if self.tabControl.index("current") == self.TAB_ROTATE:
+            self.currentAngleIndex = self.angleList.curselection()[0]
+        elif self.tabControl.index("current") == self.TAB_CROP:
+            if len(self.circleCropList.curselection()):
+                self.currentCropIndex = self.circleCropList.curselection()[0]
+            elif len(self.rectCropList.curselection()):
+                # re-use the same variable for rects, but negative
+                self.currentCropIndex = -(self.rectCropList.curselection()[0]+1)
         self.drawImage()
 
-    
+
     def rotateImage(self, angleAdjustment):
         angle = self.lineListByLength[self.lengths[self.currentAngleIndex]]['angle'] * 1.0
         angle += float(angleAdjustment)
@@ -83,6 +131,10 @@ class MobyCAIRO:
         self.angleList.delete(self.currentAngleIndex)
         self.angleList.insert(self.currentAngleIndex, str('%0.2f' % angle) + '°')
         self.drawImage()
+
+
+    def selectCropMode(self, mode):
+        print(mode)
 
 
     def drawCallback(self):
@@ -117,7 +169,6 @@ class MobyCAIRO:
         minLineLength = 50
         maxLineGap = 20
         lines = cv.HoughLinesP(edges, rho, theta, threshold, np.array([]), minLineLength=minLineLength, maxLineGap=maxLineGap)
-        print("found %d line segments using probabilistic Hough line transform" % (len(lines)))
 
         # organize the line segments into bins according to their angles
         for line in lines[:]:
@@ -147,23 +198,22 @@ class MobyCAIRO:
     # Find the circles in an image.
     # Parameters:
     #   image: the image to be analyzed
-    #   houghAnalysisSize: the pixel size to resize the image down to before analysis
-    # Returns a tuple with the following 2 fields:
-    #   * scale factor to apply to the circle components
-    #   * array of (X Y R) tuples defining circles, scaled with respect to
-    #     the houghAnalysisSize parameter, sorted in descending order by radius
+    #   houghAnalysisSize: the pixel size to resize the image down to before
+    #   analysis
+    # Upon exit, this populates self.circles with a list of (X Y R) tuples
+    #   defining circles, sorted in descending order by radius
     def findCircles(self, image, houghAnalysisSize=400):
         # set up an image for analysis
         (primeRows, primeCols, _) = image.shape
-        scaleFactor = min(primeRows, primeCols) / houghAnalysisSize
-        analyzerWidth = int(primeCols / scaleFactor)
-        analyzerHeight = int(primeRows / scaleFactor)
+        circleScaleFactor = min(primeRows, primeCols) / houghAnalysisSize
+        analyzerWidth = int(primeCols / circleScaleFactor)
+        analyzerHeight = int(primeRows / circleScaleFactor)
         analyzerImage = cv.resize(image, (analyzerWidth, analyzerHeight))
         (_, analyzerImage) = cv.threshold(analyzerImage, 60, 255, cv.THRESH_BINARY)
         analyzerImageGray = cv.cvtColor(analyzerImage, cv.COLOR_BGR2GRAY)
 
         # find the circles
-        circlesPrime = cv.HoughCircles(analyzerImageGray, cv.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=houghAnalysisSize/2)
+        circlesPrime = cv.HoughCircles(analyzerImageGray, cv.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=int(houghAnalysisSize/2))
 
         # qualify the discovered circles: no circles that go outside the box
         circles = []
@@ -173,13 +223,58 @@ class MobyCAIRO:
                centerY - radius > 0 and \
                centerX + radius < houghAnalysisSize and \
                centerY + radius < houghAnalysisSize:
+
+               # scale the parameters before appending
+               circle = (int(centerX * circleScaleFactor), int(centerY * circleScaleFactor), int(radius * circleScaleFactor))
                circles.append(circle)
 
-        # sort by radius
-        circles = sorted(circles, key=lambda x: x[2])
-        circles.reverse()
+        # sort descending by radius
+        self.circles = sorted(circles, key=lambda x: x[2])
+        self.circles.reverse()
 
-        return (scaleFactor, circles)
+
+    # Find the rectangles in an image.
+    # Parameters:
+    #   image: the image to be analyzed
+    #   houghAnalysisSize: the pixel size to resize the image down to before
+    #   analysis
+    # Upon exit, this populates self.rectanges with a list of (X Y R) tuples
+    #   defining circles, sorted in descending order by radius
+    def findRects(self, image, houghAnalysisSize=600):
+        # set up an image for analysis
+        (primeRows, primeCols, _) = image.shape
+        rectScaleFactor = min(primeRows, primeCols) / houghAnalysisSize
+        analyzerWidth = int(primeCols / rectScaleFactor)
+        analyzerHeight = int(primeRows / rectScaleFactor)
+        print(analyzerWidth, analyzerHeight)
+
+        # recipe from here: https://dev.to/simarpreetsingh019/detecting-geometrical-shapes-in-an-image-using-opencv-4g72
+        analyzerImage = cv.resize(image, (analyzerWidth, analyzerHeight))
+        analyzerImageGray = cv.cvtColor(analyzerImage, cv.COLOR_BGR2GRAY)
+        _, analyzerImage = cv.threshold(analyzerImageGray, 240, 255, cv.CHAIN_APPROX_NONE)
+
+        rects = []
+        contours, _ = cv.findContours(analyzerImage, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+        for contour in contours:
+            approx = cv.approxPolyDP(contour, 0.01 * cv.arcLength(contour, True), True)
+            if len(approx) == 4:
+                minX = minY = 99999999
+                maxX = maxY = 0
+                for point in approx:
+                    minX = min(minX, point[0][0])
+                    maxX = max(maxX, point[0][0])
+                    minY = min(minY, point[0][1])
+                    maxY = max(maxY, point[0][1])
+                minX *= rectScaleFactor
+                minY *= rectScaleFactor
+                maxX *= rectScaleFactor
+                maxY *= rectScaleFactor
+                area = (maxX - minX) * (maxY - minY)
+                rects.append((minX, minY, maxX, maxY, area))
+
+            # sort descending by rectangle area
+            self.rects = sorted(rects, key=lambda x: x[4])
+            self.rects.reverse()
 
 
     def drawImage(self):
@@ -194,8 +289,8 @@ class MobyCAIRO:
         else:
             scaledImage = cv.resize(self.imagePrime, (scaledWidth, scaledHeight))
 
-        # draw the lines computed from the Hough transform
-        if self.showLineAnalysisCheckboxValue.get():
+        # draw the lines computed from the Hough transform (only in rotate mode)
+        if self.tabControl.index("current") == self.TAB_ROTATE and self.showLineAnalysisCheckboxValue.get():
             for line in self.lineListByLength[self.lengths[self.currentAngleIndex]]['lines']:
                 (x1, y1, x2, y2) = line
                 x1 = int(x1 / scaler)
@@ -216,6 +311,19 @@ class MobyCAIRO:
                 cv.line(scaledImage, (x, 0), (x, scaledHeight), (64, 64, 64), 1)
             for y in range(1, scaledHeight, 20):
                 cv.line(scaledImage, (0, y), (scaledWidth, y), (64, 64, 64), 1)
+
+        # draw the current crop candidate
+        if self.tabControl.index("current") == self.TAB_CROP:
+            if self.currentCropIndex >= 0:
+                (centerX, centerY, radius) = self.circles[self.currentCropIndex]
+                cv.circle(scaledImage, (int(centerX/scaler), int(centerY/scaler)), int(radius/scaler), (255, 0, 0), 2)
+                cv.rectangle(scaledImage, (int((centerX-radius)/scaler), int((centerY-radius)/scaler)), 
+                    (int((centerX+radius)/scaler), int((centerY+radius)/scaler)), (200, 0, 0), 2)
+            else:
+                index = (-self.currentCropIndex) - 1
+                (minX, minY, maxX, maxY, _) = self.rects[index]
+                cv.rectangle(scaledImage, (int(minX/scaler), int(minY/scaler)), (int(maxX/scaler), int(maxY/scaler)), (255, 0, 0), 2)
+
 
         # convert to a form that Tk can display
         image = ImageTk.PhotoImage(Image.fromarray(scaledImage))
@@ -263,15 +371,34 @@ class MobyCAIRO:
         self.showComputedEdgesCheckboxValue = tk.IntVar(value=0)
         self.showComputedEdgesCheckbox = ttk.Checkbutton(self.rotateTab, text="Show computed edges", variable=self.showComputedEdgesCheckboxValue, command=self.drawImage).grid(column=0, row=5, padx=3, pady=10, sticky='w')
 
-        ttk.Label(self.rotateTab, text="Candidate Angles: ").grid(column=0, row=6, padx=3, pady=10, sticky='e')
+        ttk.Label(self.rotateTab, text="Candidate Angles: ").grid(column=0, row=6, padx=3, pady=10, sticky='ne')
         self.angleList = tk.Listbox(self.rotateTab)
         self.angleList.grid(column=1, columnspan=4, row=6, padx=5, pady=5, sticky='w')
-        self.angleList.bind('<<ListboxSelect>>', self.angleListEvent)
+        self.angleList.bind('<<ListboxSelect>>', self.listEvent)
 
 
     def initCropTab(self):
+        self.rotateTabFirstTransition = True
         self.cropTab = ttk.Frame(self.tabControl)
         self.tabControl.add(self.cropTab, text=" Crop ")
+
+        selected = tk.StringVar()
+        """
+        self.radioCropCircle = tk.Radiobutton(self.cropTab, text='Crop Circle', value='circle', variable=selected, command=lambda: self.selectCropMode('circle'))
+        self.radioCropCircle.grid(column=0, row=0, padx=3, pady=10, sticky='w')
+        self.radioCropRect = tk.Radiobutton(self.cropTab, text='Crop Rectangle', value='rect', variable=selected, command=lambda: self.selectCropMode('rect'))
+        self.radioCropRect.grid(column=1, row=0, padx=3, pady=10, sticky='w')
+        """
+
+        ttk.Label(self.cropTab, text="Candidate Circles: ").grid(column=0, row=0, padx=3, pady=10, sticky='ne')
+        self.circleCropList = tk.Listbox(self.cropTab)
+        self.circleCropList.grid(column=1, row=0, padx=5, pady=5, sticky='w')
+        self.circleCropList.bind('<<ListboxSelect>>', self.listEvent)
+
+        ttk.Label(self.cropTab, text="Candidate Rectangles: ").grid(column=0, row=1, padx=3, pady=10, sticky='ne')
+        self.rectCropList = tk.Listbox(self.cropTab)
+        self.rectCropList.grid(column=1, row=1, padx=5, pady=5, sticky='w')
+        self.rectCropList.bind('<<ListboxSelect>>', self.listEvent)
 
 
     def initSaveTab(self):
@@ -297,6 +424,7 @@ class MobyCAIRO:
 
         # make a tab control
         self.tabControl = ttk.Notebook(self.controlFrame)
+        self.tabControl.bind("<<NotebookTabChanged>>", self.tabChanged)
 
         # initialize the tabs
         self.initLoadTab()
@@ -330,8 +458,10 @@ class MobyCAIRO:
 
         # related to automated rotation
         self.currentAngleIndex = 0
+        self.currentCropIndex = 0
         self.lineList = {}
         self.lineListByLength = {}
+        self.currentRotationAngle = "0.00°"
 
         # figure out scaling
         self.scaleFactor = 1.0
