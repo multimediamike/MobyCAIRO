@@ -38,7 +38,6 @@ class MobyCAIRO:
         elif self.tabControl.index("current") == self.TAB_CROP:
             # the first time this tab is presented, select the default radio button
             if self.rotateTabFirstTransition:
-#                self.radioCropCircle.select()
                 self.rotateTabFirstTransition = False
 
             # if the rotation angle changed, recompute candidate crops
@@ -441,12 +440,6 @@ class MobyCAIRO:
         self.tabControl.add(self.cropTab, text=" Crop ")
 
         selected = tk.StringVar()
-        """
-        self.radioCropCircle = tk.Radiobutton(self.cropTab, text='Crop Circle', value='circle', variable=selected, command=lambda: self.selectCropMode('circle'))
-        self.radioCropCircle.grid(column=0, row=0, padx=3, pady=10, sticky='w')
-        self.radioCropRect = tk.Radiobutton(self.cropTab, text='Crop Rectangle', value='rect', variable=selected, command=lambda: self.selectCropMode('rect'))
-        self.radioCropRect.grid(column=1, row=0, padx=3, pady=10, sticky='w')
-        """
 
         ttk.Label(self.cropTab, text="Candidate Circles: ").grid(column=0, row=0, padx=3, pady=10, sticky='ne')
         self.circleCropList = tk.Listbox(self.cropTab)
