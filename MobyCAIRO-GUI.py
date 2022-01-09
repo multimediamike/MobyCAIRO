@@ -10,10 +10,16 @@ import tkinter.filedialog
 
 class MobyCAIRO:
 
+    # enumerating tabs
     TAB_LOAD = 0
     TAB_ROTATE = 1
     TAB_CROP = 2
     TAB_SAVE = 3
+
+    # enumerating crop modes
+    CROP_CIRCLE_ASSIST = 1
+    CROP_RECTANGLE_ASSIST = 2
+    CROP_RECTANGLE_FREEFORM = 3
 
     filetypes = (
         ('Image files', '*.png;*.jpg;*.jpeg;*.tif;*.tiff;*.bmp'),
@@ -114,6 +120,7 @@ class MobyCAIRO:
 
     def imageLabelMouseDown(self, event):
         if self.tabControl.index("current") == self.TAB_CROP:
+            self.cropMode = self.CROP_RECTANGLE_FREEFORM
             self.freeformCropActive = True
             self.freeformBoxCorner1Screen = (event.x, event.y)
             self.freeformBoxCorner2Screen = (event.x, event.y)
@@ -136,10 +143,13 @@ class MobyCAIRO:
             self.currentAngleIndex = self.angleList.curselection()[0]
         elif self.tabControl.index("current") == self.TAB_CROP:
             if len(self.circleCropList.curselection()):
+                self.cropMode = self.CROP_CIRCLE_ASSIST
                 self.currentCropIndex = self.circleCropList.curselection()[0]
+            """
             elif len(self.rectCropList.curselection()):
                 # re-use the same variable for rects, but negative
                 self.currentCropIndex = -(self.rectCropList.curselection()[0]+1)
+            """
         self.drawImage()
 
 
@@ -362,17 +372,32 @@ class MobyCAIRO:
         rotatedImage = cv.warpAffine(self.imagePrime, M, (cols, rows))
 
         # final crop
-        topX = min(self.freeformBoxCorner1Image[0], self.freeformBoxCorner2Image[0])
-        bottomX = max(self.freeformBoxCorner1Image[0], self.freeformBoxCorner2Image[0])
-        topY = min(self.freeformBoxCorner1Image[1], self.freeformBoxCorner2Image[1])
-        bottomY = max(self.freeformBoxCorner1Image[1], self.freeformBoxCorner2Image[1])
-        self.finalCroppedImage = np.zeros((bottomY-topY, bottomX-topX, 3), np.uint8)
-        for i in range(topY, bottomY):
-            self.finalCroppedImage[i-topY][:] = rotatedImage[i][topX:bottomX]
+        if self.cropMode == self.CROP_CIRCLE_ASSIST:
+            (centerX, centerY, radius) = self.circles[self.currentCropIndex]
+            diameter = int(radius*2) + 1
+            # create a white canvas for copying the circle onto
+            self.finalCroppedImage = np.zeros((diameter, diameter, 3), np.uint8)
+            cv.rectangle(self.finalCroppedImage, (0, 0), (diameter, diameter), (255, 255, 255), thickness=-1)
+
+            # copy individual lines of the circle onto the final cropped image
+            self.finalCroppedImage[radius][0:radius*2] = rotatedImage[centerY][centerX-radius:centerX+radius]
+            for i in range(radius):
+                dx = int(np.sqrt(np.square(radius) - np.square(i)))
+                self.finalCroppedImage[radius-i][radius-dx:radius+dx] = rotatedImage[centerY-i][centerX-dx:centerX+dx]
+                self.finalCroppedImage[radius+i][radius-dx:radius+dx] = rotatedImage[centerY+i][centerX-dx:centerX+dx]
+            croppedWidth = croppedHeight = diameter
+        elif self.cropMode == self.CROP_RECTANGLE_FREEFORM:
+            topX = min(self.freeformBoxCorner1Image[0], self.freeformBoxCorner2Image[0])
+            bottomX = max(self.freeformBoxCorner1Image[0], self.freeformBoxCorner2Image[0])
+            topY = min(self.freeformBoxCorner1Image[1], self.freeformBoxCorner2Image[1])
+            bottomY = max(self.freeformBoxCorner1Image[1], self.freeformBoxCorner2Image[1])
+            self.finalCroppedImage = np.zeros((bottomY-topY, bottomX-topX, 3), np.uint8)
+            for i in range(topY, bottomY):
+                self.finalCroppedImage[i-topY][:] = rotatedImage[i][topX:bottomX]
+            croppedWidth = bottomX - topX
+            croppedHeight = bottomY - topY
 
         # scale the image
-        croppedWidth = bottomX - topX
-        croppedHeight = bottomY - topY
         aspectRatio = 1.0 * croppedWidth / croppedHeight
         if aspectRatio > aspectRatio:
             scaler = croppedWidth / self.windowWidth
@@ -516,8 +541,9 @@ class MobyCAIRO:
         self.currentCropIndex = 0
         self.lineList = {}
         self.lineListByLength = {}
-        self.currentRotationAngle = "0.00°"
+        self.currentRotationAngle = "999.00°"
 
+        self.cropMode = self.CROP_CIRCLE_ASSIST
         self.freeformCropActive = False
         self.freeformBoxCorner1Screen = (0, 0)
         self.freeformBoxCorner2Screen = (0, 0)
