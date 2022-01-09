@@ -336,7 +336,7 @@ class MobyCAIRO:
         # draw the current crop candidate
         if self.tabControl.index("current") == self.TAB_CROP:
             if self.freeformCropActive:
-                cv.rectangle(scaledImage, self.freeformBoxCorner1Screen, self.freeformBoxCorner2Screen, (255, 0, 0), 2)
+                cv.rectangle(scaledImage, self.freeformBoxCorner1Screen, self.freeformBoxCorner2Screen, (255, 0, 0), 1)
                 self.freeformBoxCorner1Image = (int(self.freeformBoxCorner1Screen[0]*scaler), int(self.freeformBoxCorner1Screen[1]*scaler))
                 self.freeformBoxCorner2Image = (int(self.freeformBoxCorner2Screen[0]*scaler), int(self.freeformBoxCorner2Screen[1]*scaler))
             elif self.currentCropIndex >= 0:
