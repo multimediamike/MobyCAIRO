@@ -33,7 +33,9 @@ class MobyCAIRO:
         
 
     def tabChanged(self, event):
-        if self.tabControl.index("current") == self.TAB_CROP:
+        if self.tabControl.index("current") == self.TAB_ROTATE:
+            self.drawImage()
+        elif self.tabControl.index("current") == self.TAB_CROP:
             # the first time this tab is presented, select the default radio button
             if self.rotateTabFirstTransition:
 #                self.radioCropCircle.select()
@@ -52,7 +54,7 @@ class MobyCAIRO:
 
                 # compute most likely crop candidates
                 self.findCircles(rotatedImage)
-                self.findRects(rotatedImage)
+                #self.findRects(rotatedImage)
 
                 # populate the candidate circle crop list box
                 for i in range(len(self.circles)):
@@ -60,11 +62,15 @@ class MobyCAIRO:
                     self.circleCropList.insert(i, str('(%d, %d), %d' % (centerX, centerY, radius)))
 
                 # populate the candidate rectangle crop box
+                """
                 for i in range(len(self.rects)):
                     (minX, minY, maxX, maxY, _) = self.rects[i]
                     self.rectCropList.insert(i, str('(%d, %d) -> (%d, %d)' % (minX, minY, maxX, maxY)))
+                """
 
             self.drawImage()
+        elif self.tabControl.index("current") == self.TAB_SAVE:
+            self.drawFinalImage()
 
 
     def buttonClickLoadImage(self):
@@ -73,6 +79,8 @@ class MobyCAIRO:
             filetypes=self.filetypes,
             parent=self.parent
         )
+        if not self.imageFilename:
+            return
         self.imagePrime = cv.imread(self.imageFilename)
         self.imagePrime = cv.cvtColor(self.imagePrime, cv.COLOR_BGR2RGB)
         self.imagePrimeWidth = self.imagePrime.shape[1]
@@ -86,28 +94,41 @@ class MobyCAIRO:
         for i in range(len(self.lengths)):
             self.angleList.insert(i, str('%0.2f' % self.lineListByLength[self.lengths[i]]['angle']) + '°')
 
-        # automatically skip to the next tab
-        self.tabControl.select(1)
-
         # select the first angle in the list box
         self.angleList.select_set(0)
 
-        self.drawImage()
+        # automatically skip to the next tab
+        self.tabControl.select(1)
+
+
+    def buttonClickSaveImage(self):
+        self.saveFilename = tkinter.filedialog.asksaveasfilename(
+            title='Specify filename to save...',
+            filetypes=self.filetypes,
+            parent=self.parent
+        )
+        print(self.saveFilename)
+        if self.saveFilename:
+            cv.imwrite(self.saveFilename, self.finalCroppedImage)
 
 
     def imageLabelMouseDown(self, event):
-        self.movingImage=True
-        self.parent.config(cursor='fleur')
+        if self.tabControl.index("current") == self.TAB_CROP:
+            self.freeformCropActive = True
+            self.freeformBoxCorner1Screen = (event.x, event.y)
+            self.freeformBoxCorner2Screen = (event.x, event.y)
+            self.drawImage()
 
 
     def imageLabelMouseMove(self, event):
-        if not self.movingImage:
-            return
+        if self.tabControl.index("current") == self.TAB_CROP and self.freeformCropActive:
+            self.freeformBoxCorner2Screen = (event.x, event.y)
+            self.drawImage()
 
 
     def imageLabelMouseUp(self, event):
-        self.movingImage=False
-        self.parent.config(cursor='arrow')
+        if self.tabControl.index("current") == self.TAB_CROP:
+            self.freeformCropActive = False
 
 
     def listEvent(self, event):
@@ -246,7 +267,6 @@ class MobyCAIRO:
         rectScaleFactor = min(primeRows, primeCols) / houghAnalysisSize
         analyzerWidth = int(primeCols / rectScaleFactor)
         analyzerHeight = int(primeRows / rectScaleFactor)
-        print(analyzerWidth, analyzerHeight)
 
         # recipe from here: https://dev.to/simarpreetsingh019/detecting-geometrical-shapes-in-an-image-using-opencv-4g72
         analyzerImage = cv.resize(image, (analyzerWidth, analyzerHeight))
@@ -314,7 +334,11 @@ class MobyCAIRO:
 
         # draw the current crop candidate
         if self.tabControl.index("current") == self.TAB_CROP:
-            if self.currentCropIndex >= 0:
+            if self.freeformCropActive:
+                cv.rectangle(scaledImage, self.freeformBoxCorner1Screen, self.freeformBoxCorner2Screen, (255, 0, 0), 2)
+                self.freeformBoxCorner1Image = (int(self.freeformBoxCorner1Screen[0]*scaler), int(self.freeformBoxCorner1Screen[1]*scaler))
+                self.freeformBoxCorner2Image = (int(self.freeformBoxCorner2Screen[0]*scaler), int(self.freeformBoxCorner2Screen[1]*scaler))
+            elif self.currentCropIndex >= 0:
                 (centerX, centerY, radius) = self.circles[self.currentCropIndex]
                 cv.circle(scaledImage, (int(centerX/scaler), int(centerY/scaler)), int(radius/scaler), (255, 0, 0), 2)
                 cv.rectangle(scaledImage, (int((centerX-radius)/scaler), int((centerY-radius)/scaler)), 
@@ -324,6 +348,39 @@ class MobyCAIRO:
                 (minX, minY, maxX, maxY, _) = self.rects[index]
                 cv.rectangle(scaledImage, (int(minX/scaler), int(minY/scaler)), (int(maxX/scaler), int(maxY/scaler)), (255, 0, 0), 2)
 
+        # convert to a form that Tk can display
+        image = ImageTk.PhotoImage(Image.fromarray(scaledImage))
+        self.imageLabel.configure(image=image)
+        self.imageLabel.image = image
+
+
+    def drawFinalImage(self):
+        # rotate the image so that the angle of the computed lines is parallel to the horizontal
+        (rows, cols, _) = self.imagePrime.shape
+        angle = self.lineListByLength[self.lengths[self.currentAngleIndex]]['angle']
+        M = cv.getRotationMatrix2D(((cols-1)/2.0, (rows-1)/2.0), angle, 1)
+        rotatedImage = cv.warpAffine(self.imagePrime, M, (cols, rows))
+
+        # final crop
+        topX = min(self.freeformBoxCorner1Image[0], self.freeformBoxCorner2Image[0])
+        bottomX = max(self.freeformBoxCorner1Image[0], self.freeformBoxCorner2Image[0])
+        topY = min(self.freeformBoxCorner1Image[1], self.freeformBoxCorner2Image[1])
+        bottomY = max(self.freeformBoxCorner1Image[1], self.freeformBoxCorner2Image[1])
+        self.finalCroppedImage = np.zeros((bottomY-topY, bottomX-topX, 3), np.uint8)
+        for i in range(topY, bottomY):
+            self.finalCroppedImage[i-topY][:] = rotatedImage[i][topX:bottomX]
+
+        # scale the image
+        croppedWidth = bottomX - topX
+        croppedHeight = bottomY - topY
+        aspectRatio = 1.0 * croppedWidth / croppedHeight
+        if aspectRatio > aspectRatio:
+            scaler = croppedWidth / self.windowWidth
+        else:
+            scaler = croppedHeight / self.windowHeight
+        scaledWidth = int(croppedWidth / scaler)
+        scaledHeight = int(croppedHeight / scaler)
+        scaledImage = cv.resize(self.finalCroppedImage, (scaledWidth, scaledHeight))
 
         # convert to a form that Tk can display
         image = ImageTk.PhotoImage(Image.fromarray(scaledImage))
@@ -405,6 +462,9 @@ class MobyCAIRO:
         self.saveTab = ttk.Frame(self.tabControl)
         self.tabControl.add(self.saveTab, text=" Save ")
 
+        ttk.Label(self.saveTab, text="Save image: ").pack(side=tk.TOP, expand=tk.NO, padx=5, pady=5)
+        self.buttonLoadFile = ttk.Button(self.saveTab, text="Select file...", command=self.buttonClickSaveImage).pack(side=tk.TOP, expand=tk.NO, padx=5, pady=5)
+
 
     def initGUI(self):
         # set up window
@@ -453,7 +513,6 @@ class MobyCAIRO:
 
     def __init__(self, parent):
         self.parent = parent
-        self.movingImage = False
         self.lineAnalyzerImage = None
 
         # related to automated rotation
@@ -462,6 +521,12 @@ class MobyCAIRO:
         self.lineList = {}
         self.lineListByLength = {}
         self.currentRotationAngle = "0.00°"
+
+        self.freeformCropActive = False
+        self.freeformBoxCorner1Screen = (0, 0)
+        self.freeformBoxCorner2Screen = (0, 0)
+        self.freeformBoxCorner1Image = (0, 0)
+        self.freeformBoxCorner2Image = (0, 0)
 
         # figure out scaling
         self.scaleFactor = 1.0
