@@ -453,10 +453,12 @@ class MobyCAIRO:
         self.circleCropList.grid(column=1, row=0, padx=5, pady=5, sticky='w')
         self.circleCropList.bind('<<ListboxSelect>>', self.listEvent)
 
+        """
         ttk.Label(self.cropTab, text="Candidate Rectangles: ").grid(column=0, row=1, padx=3, pady=10, sticky='ne')
         self.rectCropList = tk.Listbox(self.cropTab)
         self.rectCropList.grid(column=1, row=1, padx=5, pady=5, sticky='w')
         self.rectCropList.bind('<<ListboxSelect>>', self.listEvent)
+        """
 
 
     def initSaveTab(self):
