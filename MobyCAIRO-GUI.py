@@ -109,7 +109,8 @@ class MobyCAIRO:
         )
         print(self.saveFilename)
         if self.saveFilename:
-            cv.imwrite(self.saveFilename, self.finalCroppedImage)
+            bgrCroppedImage = cv.cvtColor(self.finalCroppedImage, cv.COLOR_RGB2BGR)
+            cv.imwrite(self.saveFilename, bgrCroppedImage)
 
 
     def imageLabelMouseDown(self, event):
