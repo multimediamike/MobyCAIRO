@@ -172,6 +172,33 @@ class MobyCAIRO:
         self.drawImage()
 
 
+    def keyboardCallback(self, event):
+        (centerX, centerY, radius) = self.circles[self.currentCropIndex]
+
+        # adjust radius
+        if event.char in ['q', 'Q']:
+            radius += 1
+        elif event.char in ['e', 'E']:
+            radius -= 1
+
+        # adjust center up or down
+        elif event.char in ['w', 'W']:
+            centerY -= 1
+        elif event.char in ['s', 'S']:
+            centerY += 1
+
+        # adjust center left or right
+        elif event.char in ['a', 'A']:
+            centerX -= 1
+        elif event.char in ['d', 'D']:
+            centerX += 1
+
+        self.circles[self.currentCropIndex] = (centerX, centerY, radius)
+        self.circleCropList.delete(self.currentCropIndex)
+        self.circleCropList.insert(self.currentCropIndex, str('(%d, %d), %d' % (centerX, centerY, radius)))
+        self.drawImage()
+
+
     #############################################
     # Image functions
 
@@ -336,7 +363,7 @@ class MobyCAIRO:
         scaledImage = cv.warpAffine(scaledImage, M, (cols, rows))
 
         # draw a light-colored grid
-        if self.showGridLinesCheckboxValue.get():
+        if self.tabControl.index("current") == self.TAB_ROTATE and self.showGridLinesCheckboxValue.get():
             for x in range(1, scaledWidth, 20):
                 cv.line(scaledImage, (x, 0), (x, scaledHeight), (64, 64, 64), 1)
             for y in range(1, scaledHeight, 20):
@@ -353,10 +380,12 @@ class MobyCAIRO:
                 cv.circle(scaledImage, (int(centerX/scaler), int(centerY/scaler)), int(radius/scaler), (255, 0, 0), 2)
                 cv.rectangle(scaledImage, (int((centerX-radius)/scaler), int((centerY-radius)/scaler)), 
                     (int((centerX+radius)/scaler), int((centerY+radius)/scaler)), (200, 0, 0), 2)
+            """
             else:
                 index = (-self.currentCropIndex) - 1
                 (minX, minY, maxX, maxY, _) = self.rects[index]
                 cv.rectangle(scaledImage, (int(minX/scaler), int(minY/scaler)), (int(maxX/scaler), int(maxY/scaler)), (255, 0, 0), 2)
+            """
 
         # convert to a form that Tk can display
         image = ImageTk.PhotoImage(Image.fromarray(scaledImage))
@@ -464,12 +493,25 @@ class MobyCAIRO:
         self.cropTab = ttk.Frame(self.tabControl)
         self.tabControl.add(self.cropTab, text=" Crop ")
 
-        selected = tk.StringVar()
-
         ttk.Label(self.cropTab, text="Candidate Circles: ").grid(column=0, row=0, padx=3, pady=10, sticky='ne')
         self.circleCropList = tk.Listbox(self.cropTab)
         self.circleCropList.grid(column=1, row=0, padx=5, pady=5, sticky='w')
         self.circleCropList.bind('<<ListboxSelect>>', self.listEvent)
+        ttk.Label(self.cropTab, text="W/A/S/D: adjust circle's center point\nQ: increase circle's radius\nE: decrease circle's radius").grid(column=3, row=0, padx=3, pady=10, sticky='nw')
+
+        # wire up the keyboard controls for adjusting cropping circles
+        self.circleCropList.bind('<Q>', self.keyboardCallback)
+        self.circleCropList.bind('<q>', self.keyboardCallback)
+        self.circleCropList.bind('<W>', self.keyboardCallback)
+        self.circleCropList.bind('<w>', self.keyboardCallback)
+        self.circleCropList.bind('<E>', self.keyboardCallback)
+        self.circleCropList.bind('<e>', self.keyboardCallback)
+        self.circleCropList.bind('<A>', self.keyboardCallback)
+        self.circleCropList.bind('<a>', self.keyboardCallback)
+        self.circleCropList.bind('<S>', self.keyboardCallback)
+        self.circleCropList.bind('<s>', self.keyboardCallback)
+        self.circleCropList.bind('<D>', self.keyboardCallback)
+        self.circleCropList.bind('<d>', self.keyboardCallback)
 
         """
         ttk.Label(self.cropTab, text="Candidate Rectangles: ").grid(column=0, row=1, padx=3, pady=10, sticky='ne')
