@@ -92,6 +92,10 @@ class MobyCAIRO:
         self.imagePrimeHeight = self.imagePrime.shape[0]
         self.imagePrimeAspect = 1.0 * self.imagePrimeWidth / self.imagePrimeHeight
 
+        self.tabControl.tab(self.TAB_ROTATE, state="normal")
+        self.tabControl.tab(self.TAB_CROP, state="normal")
+        self.tabControl.tab(self.TAB_SAVE, state="normal")
+
         # perform straight line analysis to find possible rotation candidate angles
         self.straightLineAnalysis()
 
@@ -550,6 +554,11 @@ class MobyCAIRO:
         self.initCropTab()
         self.initSaveTab()
         self.tabControl.pack(side=tk.TOP, expand=tk.YES, fill=tk.BOTH)
+
+        # disable most tabs until the first image is loaded
+        self.tabControl.tab(self.TAB_ROTATE, state="disabled")
+        self.tabControl.tab(self.TAB_CROP, state="disabled")
+        self.tabControl.tab(self.TAB_SAVE, state="disabled")
 
         # set up the picture frame
         self.pictureFrame = tk.Frame(self.mainContainer)
