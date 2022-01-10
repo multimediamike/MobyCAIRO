@@ -198,17 +198,11 @@ class MobyCAIRO:
     #############################################
     # Image functions
 
-    def createAnalyzerImage(self):
-        if self.lineAnalyzerImage:
-            return
+    def straightLineAnalysis(self):
         # create an image for Hough line analysis; convert color -> grayscale
         self.lineAnalyzerImage = cv.cvtColor(self.imagePrime, cv.COLOR_BGR2GRAY)
         # blur the image
         self.lineAnalyzerImage = cv.GaussianBlur(self.lineAnalyzerImage, (7, 7), 0)
-
-
-    def straightLineAnalysis(self):
-        self.createAnalyzerImage()
 
         # adapting the pipeline described in this Stack Overflow answer:
         #  https://stackoverflow.com/a/45560545/475067
