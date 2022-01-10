@@ -112,7 +112,6 @@ class MobyCAIRO:
             filetypes=self.filetypes,
             parent=self.parent
         )
-        print(self.saveFilename)
         if self.saveFilename:
             bgrCroppedImage = cv.cvtColor(self.finalCroppedImage, cv.COLOR_RGB2BGR)
             cv.imwrite(self.saveFilename, bgrCroppedImage)
@@ -164,11 +163,8 @@ class MobyCAIRO:
         self.drawImage()
 
 
-    def selectCropMode(self, mode):
-        print(mode)
-
-
     def drawCallback(self):
+        print('drawCallback')
         self.drawImage()
 
 
