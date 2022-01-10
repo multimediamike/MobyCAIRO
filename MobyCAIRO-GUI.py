@@ -534,7 +534,10 @@ class MobyCAIRO:
     def initGUI(self):
         # set up window
         self.parent.title('MobyCAIRO')
-        self.parent.state('zoomed')
+        try:
+            self.parent.state('zoomed')
+        except:
+            pass
         self.mainContainer = tk.Frame(self.parent)
         self.mainContainer.pack(expand=tk.YES, fill=tk.BOTH)
 
