@@ -2,7 +2,9 @@ import ctypes
 from tkinter.constants import W
 import cv2 as cv
 import numpy as np
+import os
 from PIL import Image, ImageTk
+import sys
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
@@ -543,7 +545,8 @@ class MobyCAIRO:
         self.controlFrame.pack(side=tk.LEFT, expand=tk.NO, padx=5, pady=5, ipadx=5, ipady=5)
 
         # load the logo
-        self.logoImage = ImageTk.PhotoImage(Image.open(self.logoFilename))
+        logoPath = os.path.join(getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__))), self.logoFilename)
+        self.logoImage = ImageTk.PhotoImage(Image.open(logoPath))
         self.logoLabel = tk.Label(self.controlFrame, image=self.logoImage)
         self.logoLabel.pack(side=tk.TOP, expand=tk.YES, fill=tk.BOTH)
 
