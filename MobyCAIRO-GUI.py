@@ -493,11 +493,13 @@ class MobyCAIRO:
         self.cropTab = ttk.Frame(self.tabControl)
         self.tabControl.add(self.cropTab, text=" Crop ")
 
-        ttk.Label(self.cropTab, text="Candidate Circles: ").grid(column=0, row=0, padx=3, pady=10, sticky='ne')
+        ttk.Label(self.cropTab, text="Use the mouse to select a rectangular crop region,\nor select an auto-detected circle crop region\nand make fine adjustments with the keyboard commands").grid(column=0, row=0, columnspan=3, padx=3, pady=10, sticky='nw')
+
+        ttk.Label(self.cropTab, text="Candidate Circles: ").grid(column=0, row=1, padx=3, pady=10, sticky='ne')
         self.circleCropList = tk.Listbox(self.cropTab)
-        self.circleCropList.grid(column=1, row=0, padx=5, pady=5, sticky='w')
+        self.circleCropList.grid(column=1, row=1, padx=5, pady=5, sticky='w')
         self.circleCropList.bind('<<ListboxSelect>>', self.listEvent)
-        ttk.Label(self.cropTab, text="W/A/S/D: adjust circle's center point\nQ: increase circle's radius\nE: decrease circle's radius").grid(column=3, row=0, padx=3, pady=10, sticky='nw')
+        ttk.Label(self.cropTab, text="W/A/S/D: adjust circle's center point\nQ: increase circle's radius\nE: decrease circle's radius").grid(column=3, row=1, padx=3, pady=10, sticky='nw')
 
         # wire up the keyboard controls for adjusting cropping circles
         self.circleCropList.bind('<Q>', self.keyboardCallback)
