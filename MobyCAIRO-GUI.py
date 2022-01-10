@@ -167,11 +167,6 @@ class MobyCAIRO:
         self.drawImage()
 
 
-    def drawCallback(self):
-        print('drawCallback')
-        self.drawImage()
-
-
     def keyboardCallback(self, event):
         (centerX, centerY, radius) = self.circles[self.currentCropIndex]
 
