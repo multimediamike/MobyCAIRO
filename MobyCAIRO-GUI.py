@@ -4,6 +4,7 @@ import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import ttk
 import tkinter.filedialog
 
@@ -87,14 +88,13 @@ class MobyCAIRO:
         if not self.imageFilename:
             return
         self.imagePrime = cv.imread(self.imageFilename)
+        if self.imagePrime is None:
+            messagebox.showerror('Could not open file', 'Failed to open file "%s"\nIs it an image file?' % (self.imageFilename))
+            return
         self.imagePrime = cv.cvtColor(self.imagePrime, cv.COLOR_BGR2RGB)
         self.imagePrimeWidth = self.imagePrime.shape[1]
         self.imagePrimeHeight = self.imagePrime.shape[0]
         self.imagePrimeAspect = 1.0 * self.imagePrimeWidth / self.imagePrimeHeight
-
-        self.tabControl.tab(self.TAB_ROTATE, state="normal")
-        self.tabControl.tab(self.TAB_CROP, state="normal")
-        self.tabControl.tab(self.TAB_SAVE, state="normal")
 
         # perform straight line analysis to find possible rotation candidate angles
         self.straightLineAnalysis()
@@ -105,6 +105,10 @@ class MobyCAIRO:
 
         # select the first angle in the list box
         self.angleList.select_set(0)
+
+        self.tabControl.tab(self.TAB_ROTATE, state="normal")
+        self.tabControl.tab(self.TAB_CROP, state="normal")
+        self.tabControl.tab(self.TAB_SAVE, state="normal")
 
         # automatically skip to the next tab
         self.tabControl.select(1)
@@ -118,7 +122,11 @@ class MobyCAIRO:
         )
         if self.saveFilename:
             bgrCroppedImage = cv.cvtColor(self.finalCroppedImage, cv.COLOR_RGB2BGR)
-            cv.imwrite(self.saveFilename, bgrCroppedImage)
+            try:
+                cv.imwrite(self.saveFilename, bgrCroppedImage)
+            except cv.error as e:
+                messagebox.showerror('Failed to save image', 'Could not save image\nDid you specify a valid image extension?\n')
+                print(str(e))
 
 
     def imageLabelMouseDown(self, event):
