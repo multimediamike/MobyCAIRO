@@ -79,40 +79,6 @@ This command will first present a UI with the image and 2 buttons which prompt y
 
 Note that the output file must not exist yet. If a file with that name already exists, the tool will refuse to overwrite it and exit immediately with an error.
 
-### Keyboard User Interfacce
-
-After launching, MobyCAIRO will create a window on the right side of the screen while presenting a keyboard-based user interface on the terminal.
-
-```
-Rotation interface:
-  PgUp:  Select previous candidate angle
-  PgDn:  Select next candidate angle
-  `:     Rotate 90 degrees
-  Up:    Rotate counter-clockwise 1 degree
-  Down:  Rotate clockwise 1 degree
-  Left:  Rotate counter-clockwise 0.1 degree
-  Right: Rotate clockwise 0.1 degree
-  Space: Toggle line analyzer display
-  Enter: Finalize rotation
-  Esc:   Quit (without proceeding further)
-```
-
-```
-Circle cropping interface:
-  PgUp:  Select previous candidate circle
-  PgDn:  Select next candidate circle
-  W:     Increase radius by 1 pixel
-  S:     Decrease radius by 1 pixel
-  Left:  Move center point left 1 pixel
-  Up:    Move center point up 1 pixel
-  Right: Move center point right 1 pixel
-  Down:  Move center point down 1 pixel
-  Enter: Finalize crop and save image
-  Esc:   Quit (without proceeding further)
-```
-
-For cropping a rectangle, MobyCAIRO uses OpenCV's mouse-driven interface for selecting the crop region.
-
 ### Bulk Image Workflow
 
 If you have a directory full of images to process with the tool, use the `forfiles` tool on Windows to process them in batch. Assuming a directory called `scans/` containing a bunch of scans to be fixed (stored in PNG format), an empty subdirectory called `scans/fixed/` where the final images will be stored, and the tool located at `c:\path\MobyCAIRO.exe`:
