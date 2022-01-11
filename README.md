@@ -70,14 +70,9 @@ MobyCAIRO is a tool that runs on a user's local machine (as opposed to running i
 
 ### Running the Tool Against A Single Image
 
-Run the main MobyCAIRO.py tool against an image while also specifying an output image:
+In order to run the tool on Windows, the easiest approach is to download the release EXE and double-click it from Windows Explorer.
 
-* (Windows EXE): `MobyCAIRO <input-scan.ext> <output.ext>`
-* (Direct from Python) `python MobyCAIRO.py <input-scan.ext> <output.ext>`
-
-This command will first present a UI with the image and 2 buttons which prompt you to select whether to treat an image as a rectangle or a circle. Then it will assist you in rotating, then cropping the input image before saving it as the output image.
-
-Note that the output file must not exist yet. If a file with that name already exists, the tool will refuse to overwrite it and exit immediately with an error.
+On other platforms, establish and activate the Python environment as described in the previous step, and then execute:  `python MobyCAIRO.py`
 
 ### Bulk Image Workflow
 
