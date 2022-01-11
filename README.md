@@ -104,8 +104,9 @@ Note that there are a few caveats to the above support, as well as some more sup
 
 These are the technologies used to build this tool:
 
-* [Python 3](https://www.python.org/): The computer language used to code the tool; [tkinter](https://docs.python.org/3/library/tkinter.html) for a few GUI features
-* [OpenCV](https://opencv.org/): Open source computer vision library use for image manipulation, feature detection, and basic GUI
+* [Python 3](https://www.python.org/): The computer language used to code the tool
+* [Tkinter](https://docs.python.org/3/library/tkinter.html): The cross-platform GUI library
+* [OpenCV](https://opencv.org/): Open source computer vision library use for image manipulation, feature detection
   - [Hough transform](https://en.wikipedia.org/wiki/Hough_transform) for finding straight lines and circles
   - [Canny edge detector](https://en.wikipedia.org/wiki/Canny_edge_detector) for highlighting the edges of an image
 
