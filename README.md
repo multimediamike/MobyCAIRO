@@ -6,27 +6,25 @@ The 'Moby' portion of the name is due to its original purpose being to help alle
 
 ## Demonstration By Screenshots
 
-When run, the MobyCAIRO GUI will prompt the user to load an image for processing:
+When run, the MobyCAIRO GUI will prompt the user to load an image for processing. After loading, GUI transitions to the Rotate tab. This tab attempts to automatically detect the most likely rotation angle that will make the image straight, correcting for skew introduced in scanning the image. This is computed by detecting groups of straight lines in the image. The user can select from a number of angles and then make fine adjustments in 1, 0.1, or 0.01 degree increments:
 
-...screenshot demonstrating the basic GUI
-
-After loading, GUI transitions to the Rotate tab. This tab attempts to automatically detect the most likely rotation angle that will make the image straight, correcting for skew introduced in scanning the image. This is computed by detecting groups of straight lines in the image. The user can select from a number of angles and then make fine adjustments in 1, 0.1, or 0.01 degree increments:
-
-...screenshot demonstrating the rotation interface
+![Rotation interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-rotation.jpg)
 
 The rotation tab also allows toggling the image view to reveal the edges that MobyCAIRO used to find the straight ones.
 
-...screenshot demonstrating the line analysis view
+![Rotation interface -- edge view](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-rotation-edges.jpg)
 
 After straightening the image using the Rotate tab, move to the Crop tab. By default, MobyCAIRO will detect circles as crop candidates, and allow the user to choose among them using a list box where the circles are listed in descending order by size. Keyboard controls allow fine controls to adjust the circle:
 
-...screenshot demonstrating circle cropping
+![Circular cropping interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-circle-crop.jpg)
 
 For selecting a rectangular region to crop, simply use the mouse to select the region:
 
-...screenshot demonstrating rectangular cropping
+![Rectangular cropping interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-rectangle-crop.jpg)
 
 Once the image is rotated and cropped, move on to the Save tab which prompts the user for a filename for saving the image.
+
+![Save interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-final-save.jpg)
 
 ## Demonstration By Screenshots
 
