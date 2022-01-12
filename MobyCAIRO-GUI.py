@@ -11,6 +11,15 @@ from tkinter import ttk
 import tkinter.filedialog
 
 
+versionImported = False
+try:
+    import version
+    versionImported = True
+except ImportError:
+    pass
+if versionImported:
+
+
 class MobyCAIRO:
 
     # enumerating tabs
@@ -535,7 +544,12 @@ class MobyCAIRO:
 
     def initGUI(self):
         # set up window
-        self.parent.title('MobyCAIRO')
+        titleString = 'MobyCAIRO'
+        if versionImported:
+            titleString += ' (' + version.versionString + ')'
+        else:
+            titleString += ' (dev)'
+        self.parent.title(titleString)
         try:
             self.parent.state('zoomed')
         except:
