@@ -228,6 +228,8 @@ class MobyCAIRO:
         lines = cv.HoughLinesP(edges, rho, theta, threshold, np.array([]), minLineLength=minLineLength, maxLineGap=maxLineGap)
 
         # organize the line segments into bins according to their angles
+        self.lineList = {}
+        self.lineListByLength = {}
         for line in lines[:]:
             for (x1, y1, x2, y2) in line:
                 dx = x2 - x1
@@ -591,8 +593,6 @@ class MobyCAIRO:
         # related to automated rotation
         self.currentAngleIndex = 0
         self.currentCropIndex = 0
-        self.lineList = {}
-        self.lineListByLength = {}
         self.currentRotationAngle = "999.00°"
 
         self.cropMode = self.CROP_CIRCLE_ASSIST
