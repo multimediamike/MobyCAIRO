@@ -376,9 +376,9 @@ class MobyCAIRO:
                 self.freeformBoxCorner2Image = (int(self.freeformBoxCorner2Screen[0]*scaler), int(self.freeformBoxCorner2Screen[1]*scaler))
             elif self.currentCropIndex >= 0:
                 (centerX, centerY, radius) = self.circles[self.currentCropIndex]
-                cv.circle(scaledImage, (int(centerX/scaler), int(centerY/scaler)), int(radius/scaler), (255, 0, 0), 2)
+                cv.circle(scaledImage, (int(centerX/scaler), int(centerY/scaler)), int(radius/scaler), (255, 0, 0), 1)
                 cv.rectangle(scaledImage, (int((centerX-radius)/scaler), int((centerY-radius)/scaler)), 
-                    (int((centerX+radius)/scaler), int((centerY+radius)/scaler)), (200, 0, 0), 2)
+                    (int((centerX+radius)/scaler), int((centerY+radius)/scaler)), (200, 0, 0), 1)
             """
             else:
                 index = (-self.currentCropIndex) - 1
