@@ -340,7 +340,7 @@ class MobyCAIRO:
             scaler = self.imagePrimeHeight / self.windowHeight
         scaledWidth = int(self.imagePrimeWidth / scaler)
         scaledHeight = int(self.imagePrimeHeight / scaler)
-        if self.showComputedEdgesCheckboxValue.get():
+        if self.tabControl.index("current") == self.TAB_ROTATE and self.showComputedEdgesCheckboxValue.get():
             scaledImage = cv.resize(self.edgesImage, (scaledWidth, scaledHeight))
         else:
             scaledImage = cv.resize(self.imagePrime, (scaledWidth, scaledHeight))
