@@ -1,4 +1,4 @@
-# MobyCAIRO
+![MobyCAIRO Logo](/MobyCAIRO.png?raw=true "MobyCAIRO Logo")
 
 MobyCAIRO stands for **C**omputer-**A**ssisted **I**mage **RO**tation. It is designed to assist a user in the common, tedious tasks of rotating and cropping images.
 
@@ -6,23 +6,25 @@ The 'Moby' portion of the name is due to its original purpose being to help alle
 
 ## Demonstration By Screenshots
 
-When run, the UI will first show the image and ask whether to edit the image as a rectangle or a circle. This choice changes the interface that is used in the cropping phase (automatically detecting a circle and allowing fine adjustments vs. or a simple rectangular image select). Click on 1 of the 2 buttons, or press 'c' or 'r' if you are more keyboard-oriented:
+When run, the MobyCAIRO GUI will prompt the user to load an image for processing. After loading, GUI transitions to the Rotate tab. This tab attempts to automatically detect the most likely rotation angle that will make the image straight, correcting for skew introduced in scanning the image. This is computed by detecting groups of straight lines in the image. The user can select from a number of angles and then make fine adjustments in 1, 0.1, or 0.01 degree increments:
 
-![MobyCAIRO Editing Mode Selection](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-select-editing-mode.jpg)
+![Rotation interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-rotation.jpg)
 
-Next, MobyCAIRO finds the straight lines in the image, groups them by angles, and shows the most likely rotation while allowing the user to select among candidate angles and make fine adjustments. Further, the tool overlays a light grid which helps to visually verify straightness:
+The rotation tab also allows toggling the image view to reveal the edges that MobyCAIRO used to find the straight ones.
 
-![MobyCAIRO Assisted Rotation](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-circle-rotation.jpg)
+![Rotation interface -- edge view](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-rotation-edges.jpg)
 
-In this mode, the tool also allows toggling to see the edges that are used to determine how straight lines were discovered in the image:
+After straightening the image using the Rotate tab, move to the Crop tab. By default, MobyCAIRO will detect circles as crop candidates, and allow the user to choose among them using a list box where the circles are listed in descending order by size. Keyboard controls allow fine controls to adjust the circle:
 
-![MobyCAIRO Show Detected Lines](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-show-lines.png)
+![Circular cropping interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-circle-crop.jpg)
 
-When the image as been satisfactorily straightened, MobyCAIRO presents the user with an interface to crop the image. For a rectangular crop, the tool provides a simple mouse-driven interface. For a circle, however, MobyCAIRO assists the user by attempting to find the most likely circle. Similar to the assisted rotation, the tool allows the user to switch between likely candidate circles and also make fine adjustments.
+For selecting a rectangular region to crop, simply use the mouse to select the region:
 
-![MobyCAIRO Assisted Circle Crop](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-assisted-circle-crop.jpg)
+![Rectangular cropping interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-rectangle-crop.jpg)
 
-When the crop regions are set, the user can exit the program to save the final edited image.
+Once the image is rotated and cropped, move on to the Save tab which prompts the user for a filename for saving the image.
+
+![Save interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-final-save.jpg)
 
 *See the final straightenend and cropped scans for [this CD-ROM and related jewel case artifacts at the Internet Archive](https://archive.org/details/cdrom-WhiteWolfSoftwareSeries29).*
 
@@ -44,58 +46,9 @@ MobyCAIRO is a tool that runs on a user's local machine (as opposed to running i
 
 ## Running The Tool
 
-### Running the Tool Against A Single Image
+In order to run the tool on Windows, the easiest approach is to download the release EXE and double-click it from Windows Explorer.
 
-Run the main MobyCAIRO.py tool against an image while also specifying an output image:
-
-* (Windows EXE): `MobyCAIRO <input-scan.ext> <output.ext>`
-* (Direct from Python) `python MobyCAIRO.py <input-scan.ext> <output.ext>`
-
-This command will first present a UI with the image and 2 buttons which prompt you to select whether to treat an image as a rectangle or a circle. Then it will assist you in rotating, then cropping the input image before saving it as the output image.
-
-Note that the output file must not exist yet. If a file with that name already exists, the tool will refuse to overwrite it and exit immediately with an error.
-
-### Keyboard User Interfacce
-
-After launching, MobyCAIRO will create a window on the right side of the screen while presenting a keyboard-based user interface on the terminal.
-
-```
-Rotation interface:
-  PgUp:  Select previous candidate angle
-  PgDn:  Select next candidate angle
-  `:     Rotate 90 degrees
-  Up:    Rotate counter-clockwise 1 degree
-  Down:  Rotate clockwise 1 degree
-  Left:  Rotate counter-clockwise 0.1 degree
-  Right: Rotate clockwise 0.1 degree
-  Space: Toggle line analyzer display
-  Enter: Finalize rotation
-  Esc:   Quit (without proceeding further)
-```
-
-```
-Circle cropping interface:
-  PgUp:  Select previous candidate circle
-  PgDn:  Select next candidate circle
-  W:     Increase radius by 1 pixel
-  S:     Decrease radius by 1 pixel
-  Left:  Move center point left 1 pixel
-  Up:    Move center point up 1 pixel
-  Right: Move center point right 1 pixel
-  Down:  Move center point down 1 pixel
-  Enter: Finalize crop and save image
-  Esc:   Quit (without proceeding further)
-```
-
-For cropping a rectangle, MobyCAIRO uses OpenCV's mouse-driven interface for selecting the crop region.
-
-### Bulk Image Workflow
-
-If you have a directory full of images to process with the tool, use the `forfiles` tool on Windows to process them in batch. Assuming a directory called `scans/` containing a bunch of scans to be fixed (stored in PNG format), an empty subdirectory called `scans/fixed/` where the final images will be stored, and the tool located at `c:\path\MobyCAIRO.exe`:
-
-`forfiles /P scans\ /M *.png /C "cmd /c c:\path\MobyCAIRO.exe @file fixed/@file"`
-
-It is safe to run these batch commands repeatedly-- since the tool will not overwrite existing files, it will not destroy files that have already been processed.
+On other platforms, establish and activate the Python environment as described in the previous step, and then execute:  `python MobyCAIRO.py`
 
 ## Technical Details
 
@@ -119,9 +72,12 @@ Note that there are a few caveats to the above support, as well as some more sup
 
 These are the technologies used to build this tool:
 
-* [Python 3](https://www.python.org/): The computer language used to code the tool; [tkinter](https://docs.python.org/3/library/tkinter.html) for a few GUI features
-* [OpenCV](https://opencv.org/): Open source computer vision library use for image manipulation, feature detection, and basic GUI
+* [Python 3](https://www.python.org/): The computer language used to code the tool
+* [Tkinter](https://docs.python.org/3/library/tkinter.html): The cross-platform GUI library
+* [OpenCV](https://opencv.org/): Open source computer vision library use for image manipulation, feature detection
   - [Hough transform](https://en.wikipedia.org/wiki/Hough_transform) for finding straight lines and circles
   - [Canny edge detector](https://en.wikipedia.org/wiki/Canny_edge_detector) for highlighting the edges of an image
 
 You can read more about the program's development from [this blog post by the author](https://multimedia.cx/eggs/developing-mobycairo/).
+
+Thanks to [The e-Reader Preservation Project](https://hitsave.org/blog/nintendo-e-reader-preservation-the-ren-e-ssance/) for the cool MobyCAIRO logo.
