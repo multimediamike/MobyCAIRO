@@ -17,7 +17,6 @@ try:
     versionImported = True
 except ImportError:
     pass
-if versionImported:
 
 
 class MobyCAIRO:
