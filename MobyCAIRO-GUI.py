@@ -276,6 +276,9 @@ class MobyCAIRO:
 
         # qualify the discovered circles: no circles that go outside the box
         circles = []
+        if circlesPrime is None:
+            self.circles = []
+            return
         for circle in circlesPrime[0]:
             (centerX, centerY, radius) = circle
             if centerX - radius > 0 and \
@@ -376,17 +379,11 @@ class MobyCAIRO:
                 cv.rectangle(scaledImage, self.freeformBoxCorner1Screen, self.freeformBoxCorner2Screen, (255, 0, 0), 1)
                 self.freeformBoxCorner1Image = (int(self.freeformBoxCorner1Screen[0]*scaler), int(self.freeformBoxCorner1Screen[1]*scaler))
                 self.freeformBoxCorner2Image = (int(self.freeformBoxCorner2Screen[0]*scaler), int(self.freeformBoxCorner2Screen[1]*scaler))
-            elif self.currentCropIndex >= 0:
+            elif len(self.circles):
                 (centerX, centerY, radius) = self.circles[self.currentCropIndex]
                 cv.circle(scaledImage, (int(centerX/scaler), int(centerY/scaler)), int(radius/scaler), (255, 0, 0), 1)
                 cv.rectangle(scaledImage, (int((centerX-radius)/scaler), int((centerY-radius)/scaler)), 
                     (int((centerX+radius)/scaler), int((centerY+radius)/scaler)), (200, 0, 0), 1)
-            """
-            else:
-                index = (-self.currentCropIndex) - 1
-                (minX, minY, maxX, maxY, _) = self.rects[index]
-                cv.rectangle(scaledImage, (int(minX/scaler), int(minY/scaler)), (int(maxX/scaler), int(maxY/scaler)), (255, 0, 0), 2)
-            """
 
         # convert to a form that Tk can display
         image = ImageTk.PhotoImage(Image.fromarray(scaledImage))
