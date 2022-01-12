@@ -111,3 +111,5 @@ These are the technologies used to build this tool:
   - [Canny edge detector](https://en.wikipedia.org/wiki/Canny_edge_detector) for highlighting the edges of an image
 
 You can read more about the program's development from [this blog post by the author](https://multimedia.cx/eggs/developing-mobycairo/).
+
+Thanks to [The e-Reader Preservation Project](https://hitsave.org/blog/nintendo-e-reader-preservation-the-ren-e-ssance/) for the cool MobyCAIRO logo.
