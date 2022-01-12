@@ -101,6 +101,10 @@ class MobyCAIRO:
         # perform straight line analysis to find possible rotation candidate angles
         self.straightLineAnalysis()
 
+        # reset the list boxes
+        self.angleList.delete(0, tk.END)
+        self.circleCropList.delete(0, tk.END)
+
         # populate the candidate angle list box
         for i in range(len(self.lengths)):
             self.angleList.insert(i, str('%0.2f' % self.lineListByLength[self.lengths[i]]['angle']) + '°')
