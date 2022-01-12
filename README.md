@@ -26,26 +26,6 @@ Once the image is rotated and cropped, move on to the Save tab which prompts the
 
 ![Save interface](https://multimedia.cx/pictures/MobyCAIRO/mobycairo-gui-final-save.jpg)
 
-## Demonstration By Screenshots
-
-When run, the UI will first show the image and ask whether to edit the image as a rectangle or a circle. This choice changes the interface that is used in the cropping phase (automatically detecting a circle and allowing fine adjustments vs. or a simple rectangular image select). Click on 1 of the 2 buttons, or press 'c' or 'r' if you are more keyboard-oriented:
-
-![MobyCAIRO Editing Mode Selection](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-select-editing-mode.jpg)
-
-Next, MobyCAIRO finds the straight lines in the image, groups them by angles, and shows the most likely rotation while allowing the user to select among candidate angles and make fine adjustments. Further, the tool overlays a light grid which helps to visually verify straightness:
-
-![MobyCAIRO Assisted Rotation](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-circle-rotation.jpg)
-
-In this mode, the tool also allows toggling to see the edges that are used to determine how straight lines were discovered in the image:
-
-![MobyCAIRO Show Detected Lines](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-show-lines.png)
-
-When the image as been satisfactorily straightened, MobyCAIRO presents the user with an interface to crop the image. For a rectangular crop, the tool provides a simple mouse-driven interface. For a circle, however, MobyCAIRO assists the user by attempting to find the most likely circle. Similar to the assisted rotation, the tool allows the user to switch between likely candidate circles and also make fine adjustments.
-
-![MobyCAIRO Assisted Circle Crop](https://multimedia.cx/pictures/MobyCAIRO/MobyCAIRO-assisted-circle-crop.jpg)
-
-When the crop regions are set, the user can exit the program to save the final edited image.
-
 *See the final straightenend and cropped scans for [this CD-ROM and related jewel case artifacts at the Internet Archive](https://archive.org/details/cdrom-WhiteWolfSoftwareSeries29).*
 
 ## Downloading MobyCAIRO
@@ -66,19 +46,9 @@ MobyCAIRO is a tool that runs on a user's local machine (as opposed to running i
 
 ## Running The Tool
 
-### Running the Tool Against A Single Image
-
 In order to run the tool on Windows, the easiest approach is to download the release EXE and double-click it from Windows Explorer.
 
 On other platforms, establish and activate the Python environment as described in the previous step, and then execute:  `python MobyCAIRO.py`
-
-### Bulk Image Workflow
-
-If you have a directory full of images to process with the tool, use the `forfiles` tool on Windows to process them in batch. Assuming a directory called `scans/` containing a bunch of scans to be fixed (stored in PNG format), an empty subdirectory called `scans/fixed/` where the final images will be stored, and the tool located at `c:\path\MobyCAIRO.exe`:
-
-`forfiles /P scans\ /M *.png /C "cmd /c c:\path\MobyCAIRO.exe @file fixed/@file"`
-
-It is safe to run these batch commands repeatedly-- since the tool will not overwrite existing files, it will not destroy files that have already been processed.
 
 ## Technical Details
 
